@@ -5,10 +5,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitInstance {
 
-     public TodoAPI api = new Retrofit.Builder()
-             .baseUrl("https://jsonplaceholder.typicode.com")
+     public ImdbAPI api = new Retrofit.Builder()
+             .baseUrl("https://imdb-api.com/en/API/")
              .addConverterFactory(GsonConverterFactory.create())
              .build()
-             .create(TodoAPI.class);
+             .create(ImdbAPI.class);
 
 }
