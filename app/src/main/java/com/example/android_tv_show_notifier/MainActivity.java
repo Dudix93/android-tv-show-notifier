@@ -23,9 +23,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<MostPopularDataDetailModel> todosArrayList;
-    private RecyclerView todosRecyclerView;
-    private RecyclerView.Adapter todosListAdapter;
+    private ArrayList<MostPopularDataDetailModel> moviesArrayList;
+    private RecyclerView moviesRecyclerView;
+    private RecyclerView.Adapter moviesListAdapter;
     private Context mContext;
 
     @Override
@@ -47,12 +47,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else {
                         if (response.body() != null) {
-                            todosArrayList = new ArrayList<MostPopularDataDetailModel>(response.body().getItems());
-                            todosRecyclerView = (RecyclerView) findViewById(R.id.todos);
+                            moviesArrayList = new ArrayList<MostPopularDataDetailModel>(response.body().getItems());
+                            moviesRecyclerView = (RecyclerView) findViewById(R.id.movies);
                             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
-                            todosRecyclerView.setLayoutManager(mLayoutManager);
-                            todosListAdapter = new MoviesListAdapter(todosArrayList);
-                            todosRecyclerView.setAdapter(todosListAdapter);
+                            moviesRecyclerView.setLayoutManager(mLayoutManager);
+                            moviesListAdapter = new MoviesListAdapter(moviesArrayList, mContext);
+                            moviesRecyclerView.setAdapter(moviesListAdapter);
                         }
                     }
                 }
