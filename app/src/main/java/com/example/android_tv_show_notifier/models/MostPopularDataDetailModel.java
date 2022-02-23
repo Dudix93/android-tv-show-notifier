@@ -1,4 +1,4 @@
-package com.example.android_tv_show_notifier;
+package com.example.android_tv_show_notifier.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

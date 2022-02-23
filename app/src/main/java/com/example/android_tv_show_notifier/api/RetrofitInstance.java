@@ -1,4 +1,4 @@
-package com.example.android_tv_show_notifier;
+package com.example.android_tv_show_notifier.api;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

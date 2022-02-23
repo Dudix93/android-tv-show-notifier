@@ -1,4 +1,4 @@
-package com.example.android_tv_show_notifier;
+package com.example.android_tv_show_notifier.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
+import com.example.android_tv_show_notifier.R;
 
 import java.util.ArrayList;
 

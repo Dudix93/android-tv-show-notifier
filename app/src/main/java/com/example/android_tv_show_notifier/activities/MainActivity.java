@@ -1,4 +1,4 @@
-package com.example.android_tv_show_notifier;
+package com.example.android_tv_show_notifier.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -6,20 +6,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.example.android_tv_show_notifier.R;
+import com.example.android_tv_show_notifier.adapters.MoviesListAdapter;
+import com.example.android_tv_show_notifier.api.ImdbAPI;
+import com.example.android_tv_show_notifier.api.RetrofitInstance;
+import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
+import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         this.mContext = getApplicationContext();
         ImdbAPI imdbAPI = new RetrofitInstance().api;
 
-        Call<MostPopularDataModel> call = imdbAPI.getMostPopularMovies();
+        Call<MostPopularDataModel> call = imdbAPI.getMostPopularTVs();
 
         try {
             call.enqueue(new Callback<MostPopularDataModel>() {
