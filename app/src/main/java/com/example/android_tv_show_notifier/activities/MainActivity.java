@@ -27,18 +27,23 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView moviesRecyclerView;
     private RecyclerView.Adapter moviesListAdapter;
     private Context mContext;
+    private Call<MostPopularDataModel> MostPopularTVsAPICall;
+    private ImdbAPI imdbAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.mContext = getApplicationContext();
-        ImdbAPI imdbAPI = new RetrofitInstance().api;
+        this.imdbAPI = new RetrofitInstance().api;
+        this.MostPopularTVsAPICall = imdbAPI.getMostPopularTVs();
 
-        Call<MostPopularDataModel> call = imdbAPI.getMostPopularTVs();
+        getMostPopularTVs();
+    }
 
+    public void getMostPopularTVs() {
         try {
-            call.enqueue(new Callback<MostPopularDataModel>() {
+            MostPopularTVsAPICall.enqueue(new Callback<MostPopularDataModel>() {
                 @Override
                 public void onResponse(Call<MostPopularDataModel> call, Response<MostPopularDataModel> response) {
 
@@ -59,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<MostPopularDataModel> call, Throwable t) {
-                        Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e) {

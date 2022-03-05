@@ -2,9 +2,11 @@ package com.example.android_tv_show_notifier.api;
 
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
+import com.example.android_tv_show_notifier.models.TitleModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 public interface ImdbAPI {
 
@@ -16,5 +18,8 @@ public interface ImdbAPI {
 
     @GET("ComingSoon/k_9od86016")
     Call<NewMovieDataModel> getComingSoon();
+
+    @GET("Title/k_9od86016/" + "{id}")
+    Call<TitleModel> getTitle(@Path("id") String id);
 
 }
