@@ -7,14 +7,17 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -161,6 +164,12 @@ public class TitleActivity extends AppCompatActivity {
         new DownloadImageFromUrl(posterImageView).execute(titleModel.getImage());
         new ThumbnailAsyncTask(this).execute();
         setToolbar();
+        trailerThumbnailImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerModel.getLink())));
+            }
+        });
     }
 
     private static class ThumbnailAsyncTask extends AsyncTask<String, Integer, Drawable> {
@@ -174,8 +183,8 @@ public class TitleActivity extends AppCompatActivity {
         @Override
         protected Drawable doInBackground(String... strings) {
             Bitmap bmp = null;
+            TitleActivity activity = activityReference.get();
             try {
-                TitleActivity activity = activityReference.get();
                 HttpURLConnection connection = (HttpURLConnection) new URL(activity.trailerModel.getThumbnailUrl()).openConnection();
                 connection.connect();
                 InputStream input = connection.getInputStream();
@@ -183,7 +192,10 @@ public class TitleActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return new BitmapDrawable(bmp);
+            return new BitmapDrawable(activity.getResources(), Bitmap.createScaledBitmap(bmp,
+                    activity.getWindow().getDecorView().getWidth(),
+                    500,
+                    true));
         }
 
         protected void onPostExecute(Drawable result) {
@@ -194,7 +206,6 @@ public class TitleActivity extends AppCompatActivity {
             layers[1] = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.ic_play, null);
             LayerDrawable layerDrawable = new LayerDrawable(layers);
             trailerThumbnailImageView.setImageDrawable(layerDrawable);
-
         }
     }
 }
