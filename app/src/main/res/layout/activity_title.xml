@@ -51,6 +51,16 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/title_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:textSize="32sp"/>
+
+            <TextView
                 android:id="@+id/title_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,6 +95,11 @@
                 android:fontFamily="sans-serif-light"
                 android:lineSpacingMultiplier="1.2"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+            <ImageView
+                android:id="@+id/trailer_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 

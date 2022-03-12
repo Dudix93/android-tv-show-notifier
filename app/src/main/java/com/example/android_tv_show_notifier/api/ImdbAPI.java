@@ -3,6 +3,7 @@ package com.example.android_tv_show_notifier.api;
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
+import com.example.android_tv_show_notifier.models.TrailerModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -21,5 +22,8 @@ public interface ImdbAPI {
 
     @GET("Title/k_9od86016/" + "{id}")
     Call<TitleModel> getTitle(@Path("id") String id);
+
+    @GET("Trailer/k_9od86016/" + "{id}")
+    Call<TrailerModel> getTrailer(@Path("id") String id);
 
 }
