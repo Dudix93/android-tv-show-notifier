@@ -6,6 +6,8 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -24,8 +26,12 @@ import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.R;
+import com.example.android_tv_show_notifier.adapters.ActorsListAdapter;
+import com.example.android_tv_show_notifier.adapters.MoviesListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
+import com.example.android_tv_show_notifier.models.ActorModel;
+import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -35,6 +41,7 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,6 +66,9 @@ public class TitleActivity extends AppCompatActivity {
     private TitleModel titleModel;
     private TrailerModel trailerModel;
     private Drawable trailerThumbnailDrawable;
+    private RecyclerView actorsRecyclerView;
+    private ArrayList<ActorModel> actorsArrayList;
+    private ActorsListAdapter actorsListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,8 +161,6 @@ public class TitleActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
-        } else {
-            // Don't inflate. Tablet is in landscape mode.
         }
     }
 
@@ -170,8 +178,18 @@ public class TitleActivity extends AppCompatActivity {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerModel.getLink())));
             }
         });
+        setActorsList();
     }
 
+    public void setActorsList() {
+        actorsArrayList = new ArrayList<ActorModel>(titleModel.getActorList());
+        actorsRecyclerView = (RecyclerView) findViewById(R.id.actors_list);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        actorsRecyclerView.setLayoutManager(mLayoutManager);
+        actorsListAdapter = new ActorsListAdapter(actorsArrayList, getApplicationContext());
+        actorsRecyclerView.setAdapter(actorsListAdapter);    
+    }
+    
     private static class ThumbnailAsyncTask extends AsyncTask<String, Integer, Drawable> {
 
         private WeakReference<TitleActivity> activityReference;
