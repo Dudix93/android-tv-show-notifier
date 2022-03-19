@@ -140,15 +140,14 @@ public class TitleActivity extends AppCompatActivity {
     }
 
     public void fillTitleData() {
-        if (this.intentExtras != null) {
-            if (intentExtras.containsKey("title_id")) {
-                this.titleId = this.intentExtras.getString("title_id");
-                this.imdbAPI = new RetrofitInstance().api;
-                this.TitleAPICall = imdbAPI.getTitle(this.titleId);
-                this.TrailerAPICall = imdbAPI.getTrailer(this.titleId);
-                getTitleData(this.titleId);
-            }
-        }
+//        if (this.intentExtras != null && intentExtras.containsKey("title_id")) {
+//            this.titleId = this.intentExtras.getString("title_id");
+            this.titleId = "tt0110413";
+            this.imdbAPI = new RetrofitInstance().api;
+            this.TitleAPICall = imdbAPI.getTitle(this.titleId);
+            this.TrailerAPICall = imdbAPI.getTrailer(this.titleId);
+            getTitleData(this.titleId);
+//        }
     }
 
     public void setToolbar() {
