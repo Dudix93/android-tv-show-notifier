@@ -1,8 +1,10 @@
 package com.example.android_tv_show_notifier.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,11 +12,13 @@ import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.R;
+import com.example.android_tv_show_notifier.adapters.KnownForListAdapter;
 import com.example.android_tv_show_notifier.adapters.MoviesListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.KnownForModel;
+import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.NameModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 
@@ -32,29 +36,30 @@ public class ActorActivity extends AppCompatActivity {
     private ImageView actorPhotoImageView;
     private TextView actorSummaryTextView;
     private TextView actorNameTextView;
-    private RecyclerView actorKnownForRecyclerView;
-    private MoviesListAdapter moviesListAdapter;
+    private KnownForListAdapter knownForListAdapter;
     private NameModel nameModel;
     private Call<NameModel> actorAPICall;
     private ImdbAPI imdbAPI;
     private ArrayList<KnownForModel> knownForArrayList;
+    private RecyclerView knownForRecyclerView;
+    private Context mContext;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actor);
         this.intentExtras = getIntent().getExtras();
-//        if (this.intentExtras != null && this.intentExtras.containsKey("actor_id")) {
-//            this.actorId = this.intentExtras.getString("actor_id");
-            this.actorId = "nm0000204";
+        if (this.intentExtras != null && this.intentExtras.containsKey("actor_id")) {
+            this.actorId = this.intentExtras.getString("actor_id");
+            this.mContext = getApplicationContext();
             this.actorPhotoImageView = findViewById(R.id.actor_photo);
             this.actorSummaryTextView = findViewById(R.id.actor_summary);
             this.actorNameTextView = findViewById(R.id.actor_name);
-            this.actorKnownForRecyclerView = findViewById(R.id.actor_known_for_list);
+            this.knownForRecyclerView = findViewById(R.id.actor_known_for_list);
             this.imdbAPI = new RetrofitInstance().api;
             this.actorAPICall = this.imdbAPI.getActor(this.actorId);
             getActorData();
-//        }
+        }
     }
 
     public void getActorData() {
@@ -76,7 +81,7 @@ public class ActorActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<NameModel> call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                    Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_LONG);
                 }
             });
         } catch (Exception e) {
@@ -88,5 +93,12 @@ public class ActorActivity extends AppCompatActivity {
         new DownloadImageFromUrl(this.actorPhotoImageView).execute(this.nameModel.getImage());
         this.actorSummaryTextView.setText(this.nameModel.getSummary());
         this.actorNameTextView.setText(this.nameModel.getName());
+
+        knownForArrayList = new ArrayList<KnownForModel>(nameModel.getKnownFor());
+        knownForRecyclerView = (RecyclerView) findViewById(R.id.actor_known_for_list);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
+        knownForRecyclerView.setLayoutManager(mLayoutManager);
+        knownForListAdapter = new KnownForListAdapter(knownForArrayList, mContext);
+        knownForRecyclerView.setAdapter(knownForListAdapter);
     }
 }
