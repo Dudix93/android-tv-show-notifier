@@ -14,7 +14,10 @@
         <activity
             android:name=".activities.TitleActivity"
             android:exported="false"
-            android:label="@string/title_activity_title"
+            android:theme="@style/Theme.Androidtvshownotifier.NoActionBar" />
+        <activity
+            android:name=".activities.ActorActivity"
+            android:exported="false"
             android:theme="@style/Theme.Androidtvshownotifier.NoActionBar" />
         <activity
             android:name=".activities.MainActivity"
