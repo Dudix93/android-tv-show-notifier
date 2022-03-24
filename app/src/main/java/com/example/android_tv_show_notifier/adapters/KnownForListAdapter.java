@@ -12,6 +12,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.TitleActivity;
 import com.example.android_tv_show_notifier.models.KnownForModel;
@@ -63,6 +64,7 @@ public class KnownForListAdapter extends RecyclerView.Adapter<KnownForListAdapte
         viewHolder.getReleaseYearTextView().setText(this.mMovies.get(position).getYear());
         Glide.with(this.mContext)
                 .load(this.mMovies.get(position).getImage())
+                .apply(new RequestOptions().override(200, 300))
                 .into(viewHolder.getMoviePosterImageView());
 
         viewHolder.getTitleCardView().setOnClickListener(new View.OnClickListener() {
