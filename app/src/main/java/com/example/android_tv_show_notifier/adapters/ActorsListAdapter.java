@@ -14,7 +14,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
+import com.example.android_tv_show_notifier.activities.ActorActivity;
 import com.example.android_tv_show_notifier.activities.TitleActivity;
 import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.ActorModel;
@@ -59,17 +61,18 @@ public class ActorsListAdapter extends RecyclerView.Adapter<ActorsListAdapter.Ac
         new DownloadImageFromUrl(viewHolder.getActorPhotoImageView()).execute(this.mActors.get(position).getImage());
         Glide.with(this.mContext)
                 .load(this.mActors.get(position).getImage())
+                .apply(new RequestOptions().override(200, 300))
                 .into(viewHolder.getActorPhotoImageView());
 
-//        viewHolder.getTitleCardView().setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent titleIntent = new Intent(view.getContext(), TitleActivity.class);
-//                titleIntent.putExtra("title_id", mActors.get(viewHolder.getAdapterPosition()).getId());
-//                titleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                mContext.startActivity(titleIntent);
-//            }
-//        });
+        viewHolder.getActorPhotoImageView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent actorIntent = new Intent(view.getContext(), ActorActivity.class);
+                actorIntent.putExtra("actor_id", mActors.get(viewHolder.getAdapterPosition()).getId());
+                actorIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(actorIntent);
+            }
+        });
     }
 
     @Override
