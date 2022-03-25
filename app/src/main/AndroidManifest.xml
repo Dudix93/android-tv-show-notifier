@@ -21,6 +21,7 @@
             android:theme="@style/Theme.Androidtvshownotifier.NoActionBar" />
         <activity
             android:name=".activities.MainActivity"
+            android:theme="@style/Theme.Androidtvshownotifier.NoActionBar"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

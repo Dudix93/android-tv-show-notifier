@@ -1,11 +1,19 @@
 package com.example.android_tv_show_notifier.activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.R;
@@ -14,6 +22,9 @@ import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -21,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private ArrayList<MostPopularDataDetailModel> moviesArrayList;
     private RecyclerView moviesRecyclerView;
@@ -37,7 +48,10 @@ public class MainActivity extends AppCompatActivity {
         this.mContext = getApplicationContext();
         this.imdbAPI = new RetrofitInstance().api;
         this.MostPopularTVsAPICall = imdbAPI.getMostPopularTVs();
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        setToolbar();
         getMostPopularTVs();
     }
 
@@ -70,5 +84,52 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
         }
+    }
+
+    public void setToolbar() {
+        Toolbar toolbar = findViewById(R.id. toolbar ) ;
+        setSupportActionBar(toolbar) ;
+        DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer , toolbar , R.string.navigation_drawer_open ,
+                R.string.navigation_drawer_close ) ;
+        drawer.addDrawerListener(toggle) ;
+        toggle.syncState() ;
+        NavigationView navigationView = findViewById(R.id. nav_view ) ;
+        navigationView.setNavigationItemSelectedListener( this ) ;
+    }
+
+    @Override
+    public void onBackPressed () {
+        DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
+        if (drawer.isDrawerOpen(GravityCompat. START )) {
+            drawer.closeDrawer(GravityCompat. START ) ;
+        } else {
+            super .onBackPressed() ;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        int id = item.getItemId() ;
+        return super.onOptionsItemSelected(item) ;
+    }
+
+    @SuppressWarnings ( "StatementWithEmptyBody" )
+    @Override
+    public boolean onNavigationItemSelected ( @NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId() ;
+        if (id == R.id. nav_camera ) {
+            // Handle the camera action
+        } else if (id == R.id. nav_gallery ) {
+        } else if (id == R.id. nav_slideshow ) {
+        } else if (id == R.id. nav_manage ) {
+        } else if (id == R.id. nav_share ) {
+        } else if (id == R.id. nav_send ) {
+        }
+        DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
+        drawer.closeDrawer(GravityCompat. START ) ;
+        return true;
     }
 }
