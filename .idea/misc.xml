@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/drawable/ic_account_icon.xml" value="0.2215" />
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/layout/activity_main_drawer.xml" value="0.27309782608695654" />
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/layout/app_bar_main.xml" value="0.27309782608695654" />
@@ -12,6 +13,7 @@
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/layout/item_todo.xml" value="0.33" />
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/layout/nav_header_main.xml" value="0.27309782608695654" />
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/layout/styles.xml" value="0.27309782608695654" />
+        <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/menu/activity_main_drawer.xml" value="0.36302083333333335" />
       </map>
     </option>
   </component>

@@ -7,26 +7,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.android_tv_show_notifier.activities.TitleActivity;
-import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.R;
+import com.example.android_tv_show_notifier.activities.TitleActivity;
+import com.example.android_tv_show_notifier.models.NewMovieDataDetailModel;
 
 import java.util.ArrayList;
 
-public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.MovieViewHolder> {
+public class NewMoviesListAdapter extends RecyclerView.Adapter<NewMoviesListAdapter.MovieViewHolder> {
 
-    private ArrayList<MostPopularDataDetailModel> mMovies = new ArrayList<MostPopularDataDetailModel>();
+    private ArrayList<NewMovieDataDetailModel> mMovies = new ArrayList<NewMovieDataDetailModel>();
     private Context mContext;
 
-    public MoviesListAdapter(ArrayList<MostPopularDataDetailModel> movies, Context context) {
+    public NewMoviesListAdapter(ArrayList<NewMovieDataDetailModel> movies, Context context) {
         this.mMovies = movies;
         this.mContext = context;
     }

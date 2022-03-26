@@ -2,7 +2,6 @@ package com.example.android_tv_show_notifier.activities;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,11 +25,9 @@ import android.widget.Toast;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.ActorsListAdapter;
-import com.example.android_tv_show_notifier.adapters.MoviesListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.ActorModel;
-import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
 import com.google.android.material.appbar.CollapsingToolbarLayout;

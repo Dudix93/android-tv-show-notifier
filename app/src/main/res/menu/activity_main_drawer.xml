@@ -4,26 +4,16 @@
     tools:showIn= "navigation_view" >
     <group android:checkableBehavior= "single" >
         <item
-            android:id= "@+id/nav_camera"
-            android:title= "Import" />
+            android:id= "@+id/nav_top_tv"
+            android:title= "@string/top_tv" />
         <item
-            android:id= "@+id/nav_gallery"
-            android:title= "Gallery" />
+            android:id= "@+id/nav_top_movies"
+            android:title= "@string/top_movies" />
         <item
-            android:id= "@+id/nav_slideshow"
-            android:title= "Slideshow" />
+            android:id= "@+id/nav_in_theaters"
+            android:title= "In Theaters" />
         <item
-            android:id= "@+id/nav_manage"
-            android:title= "Tools" />
+            android:id= "@+id/nav_coming_soon"
+            android:title= "Coming Soon" />
     </group>
-    <item android:title= "Communicate" >
-        <menu>
-            <item
-                android:id= "@+id/nav_share"
-                android:title= "Share" />
-            <item
-                android:id= "@+id/nav_send"
-                android:title= "Send" />
-        </menu>
-    </item>
 </menu>

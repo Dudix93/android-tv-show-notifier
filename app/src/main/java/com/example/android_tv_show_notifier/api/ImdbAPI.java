@@ -22,6 +22,9 @@ public interface ImdbAPI {
     @GET("ComingSoon/k_9od86016")
     Call<NewMovieDataModel> getComingSoon();
 
+    @GET("InTheaters/k_9od86016")
+    Call<NewMovieDataModel> getInTheaters();
+
     @GET("Title/k_9od86016/" + "{id}")
     Call<TitleModel> getTitle(@Path("id") String id);
 
