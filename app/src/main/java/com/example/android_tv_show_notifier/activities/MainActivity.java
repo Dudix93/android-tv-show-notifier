@@ -1,6 +1,11 @@
 package com.example.android_tv_show_notifier.activities;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -9,9 +14,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.R;
@@ -23,7 +31,21 @@ import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataDetailModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.ArrayList;
 
@@ -35,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ArrayList<MostPopularDataDetailModel> moviesArrayList;
     private RecyclerView moviesRecyclerView;
+    private NavigationView navigationView;
     private MostPopularMoviesListAdapter mostPopularMoviesListAdapter;
     private NewMoviesListAdapter newMoviesListAdapter;
     private Context mContext;
@@ -44,6 +67,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Call<NewMovieDataModel> ComingSoonAPICall;
     private ImdbAPI imdbAPI;
     private Toolbar toolbar;
+    private SignInButton btSignIn;
+    private GoogleSignInClient googleSignInClient;
+    private FirebaseAuth firebaseAuth;
+    private GoogleSignInOptions googleSignInOptions;
+    private ActivityResultLauncher activityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +85,73 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         moviesRecyclerView = (RecyclerView) findViewById(R.id.movies);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
         moviesRecyclerView.setLayoutManager(mLayoutManager);
+        firebaseAuth = FirebaseAuth.getInstance();
         setToolbar();
         getMostPopularTVs();
+        setGoogleSignIn();
+    }
+
+    public void setGoogleSignIn() {
+        btSignIn = navigationView.getHeaderView(0).findViewById(R.id.bt_sign_in);
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(MainActivity.this ,googleSignInOptions);
+        setActivityResultLauncher();
+        btSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent googleSignInIntent = googleSignInClient.getSignInIntent();
+                activityResultLauncher.launch(googleSignInIntent);
+            }
+        });
+    }
+
+    public void setActivityResultLauncher() {
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback() {
+            @Override
+            public void onActivityResult(Object result) {
+                if (((ActivityResult)result).getData() != null) {
+                    Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn.getSignedInAccountFromIntent(((ActivityResult)result).getData());
+
+                    if(signInAccountTask.isSuccessful())
+                    {
+                        String s = "Google sign in successful";
+                        displayToast(s);
+                        try {
+                            GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
+                            if(googleSignInAccount != null)
+                            {
+                                AuthCredential authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(),null);
+                                firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if(task.isSuccessful())
+                                        {
+                                            firebaseAuth = FirebaseAuth.getInstance();
+                                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                                            if (firebaseUser != null)
+                                            {
+                                                displayToast("Hi " + firebaseUser.getDisplayName());
+                                            }
+                                        }
+                                        else
+                                        {
+                                            displayToast("Authentication Failed :"+task.getException().getMessage());
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        catch (ApiException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public void getMostPopularTVs() {
@@ -69,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onResponse(Call<MostPopularDataModel> call, Response<MostPopularDataModel> response) {
 
                     if (response.code() != 200) {
-                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                        displayToast(response.message());
                     }
                     else {
                         if (response.body() != null) {
@@ -80,11 +173,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onFailure(Call<MostPopularDataModel> call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                    displayToast(t.getMessage());
                 }
             });
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            displayToast(e.getMessage());
         }
     }
 
@@ -96,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onResponse(Call<MostPopularDataModel> call, Response<MostPopularDataModel> response) {
 
                     if (response.code() != 200) {
-                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                        displayToast(response.message());
                     }
                     else {
                         if (response.body() != null) {
@@ -107,11 +200,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onFailure(Call<MostPopularDataModel> call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                    displayToast(t.getMessage());
                 }
             });
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            displayToast(e.getMessage());
         }
     }
 
@@ -123,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onResponse(Call<NewMovieDataModel> call, Response<NewMovieDataModel> response) {
 
                     if (response.code() != 200) {
-                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                        displayToast(response.message());
                     }
                     else {
                         if (response.body() != null) {
@@ -134,11 +227,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onFailure(Call<NewMovieDataModel> call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                    displayToast(t.getMessage());
                 }
             });
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            displayToast(e.getMessage());
         }
     }
 
@@ -150,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onResponse(Call<NewMovieDataModel> call, Response<NewMovieDataModel> response) {
 
                     if (response.code() != 200) {
-                        Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG);
+                        displayToast(response.message());
                     }
                     else {
                         if (response.body() != null) {
@@ -161,34 +254,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onFailure(Call<NewMovieDataModel> call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG);
+                    displayToast(t.getMessage());
                 }
             });
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            displayToast(e.getMessage());
         }
     }
 
     public void setToolbar() {
-        toolbar = findViewById(R.id. toolbar );
-        setSupportActionBar(toolbar) ;
-        DrawerLayout drawer = findViewById(R.id. drawer_layout );
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer , toolbar , R.string.navigation_drawer_open ,
-                R.string.navigation_drawer_close ) ;
-        drawer.addDrawerListener(toggle) ;
-        toggle.syncState() ;
-        NavigationView navigationView = findViewById(R.id. nav_view ) ;
-        navigationView.setNavigationItemSelectedListener( this ) ;
+                R.string.navigation_drawer_close );
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public void onBackPressed () {
-        DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
+        DrawerLayout drawer = findViewById(R.id. drawer_layout );
         if (drawer.isDrawerOpen(GravityCompat. START )) {
-            drawer.closeDrawer(GravityCompat. START ) ;
+            drawer.closeDrawer(GravityCompat. START );
         } else {
-            super .onBackPressed() ;
+            super.onBackPressed();
         }
     }
 
@@ -227,5 +320,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void setNewMoviesListAdapterListAdapter(ArrayList<NewMovieDataDetailModel> arrayList) {
         newMoviesListAdapter = new NewMoviesListAdapter(arrayList, mContext);
         moviesRecyclerView.setAdapter(newMoviesListAdapter);
+    }
+
+    private void displayToast(String s) {
+        Toast.makeText(mContext,s,Toast.LENGTH_SHORT).show();
     }
 }

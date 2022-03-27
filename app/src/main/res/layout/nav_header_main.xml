@@ -14,13 +14,10 @@
             android:layout_height = "match_parent"
             android:src="@drawable/ic_account_icon" />
 
-        <TextView
-            android:layout_width= "match_parent"
-            android:layout_height= "match_parent"
-            android:text= "Log in"
-            android:gravity="center|left"
-            android:layout_marginStart="20dp"
-            android:layout_toRightOf="@id/account_icon"
-            android:textColor="@color/black" />
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/bt_sign_in"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/account_icon" />
 
     </RelativeLayout>

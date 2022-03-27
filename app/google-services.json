@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "147928523431",
+    "project_id": "android-tv-notifier",
+    "storage_bucket": "android-tv-notifier.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147928523431:android:310a51ffcd14b7a563f182",
+        "android_client_info": {
+          "package_name": "com.example.android_tv_show_notifier"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "147928523431-5pm0uula17m5b92949mfegqkpmm4u56j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android_tv_show_notifier",
+            "certificate_hash": "d0b2f7088a068764f739e47c9894c3f63c3e29be"
+          }
+        },
+        {
+          "client_id": "147928523431-scli9rq7351fpu8v9b9k3kok8qvgvh81.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJGzeBoFfvsIjdpbnK3I52Ys1Ju1vvSBk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "147928523431-scli9rq7351fpu8v9b9k3kok8qvgvh81.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
