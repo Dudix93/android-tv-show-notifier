@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TableLayout;
 import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.R;
@@ -67,11 +69,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Call<NewMovieDataModel> ComingSoonAPICall;
     private ImdbAPI imdbAPI;
     private Toolbar toolbar;
-    private SignInButton btSignIn;
+    private Button btSignIn;
     private GoogleSignInClient googleSignInClient;
     private FirebaseAuth firebaseAuth;
     private GoogleSignInOptions googleSignInOptions;
     private ActivityResultLauncher activityResultLauncher;
+    private AuthCredential authCredential;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void setGoogleSignIn() {
         btSignIn = navigationView.getHeaderView(0).findViewById(R.id.bt_sign_in);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
+        }
+        else {
+            btSignIn.setText(R.string.log_in);
+        }
         googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -108,6 +120,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    public void setLogInOnClickListener() {
+        btSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent googleSignInIntent = googleSignInClient.getSignInIntent();
+                activityResultLauncher.launch(googleSignInIntent);
+            }
+        });
+    }
+
+    public void setLogOutOnClickListener() {
+        btSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            firebaseAuth.signOut();
+                            btSignIn.setText(R.string.log_in);
+                            displayToast("Logout successful");
+                            setLogInOnClickListener();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     public void setActivityResultLauncher() {
         activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback() {
             @Override
@@ -117,23 +159,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     if(signInAccountTask.isSuccessful())
                     {
-                        String s = "Google sign in successful";
-                        displayToast(s);
                         try {
                             GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
                             if(googleSignInAccount != null)
                             {
-                                AuthCredential authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(),null);
+                                authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(),null);
                                 firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if(task.isSuccessful())
                                         {
+                                            setLogOutOnClickListener();
                                             firebaseAuth = FirebaseAuth.getInstance();
-                                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                                            firebaseUser = firebaseAuth.getCurrentUser();
                                             if (firebaseUser != null)
                                             {
                                                 displayToast("Hi " + firebaseUser.getDisplayName());
+                                                btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
                                             }
                                         }
                                         else
