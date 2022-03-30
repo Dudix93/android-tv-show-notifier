@@ -6,4 +6,10 @@
     <string name="in_theaters">In Theaters</string>
     <string name="top_movies">Most Popular Movies</string>
     <string name="top_tv">Most Popular Tv Shows</string>
+    <string name="log_in">Log in</string>
+    <string name="log_out">Log out</string>
+    <string name="fav">Add as favourite</string>
+    <string name="unfav">Remove from favourites</string>
+    <string name="fav_added">Saved as favourite</string>
+    <string name="fav_removed">Removed from favourites</string>
 </resources>

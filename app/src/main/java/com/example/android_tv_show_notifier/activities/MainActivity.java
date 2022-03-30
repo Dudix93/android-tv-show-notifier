@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
+import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.MostPopularMoviesListAdapter;
 import com.example.android_tv_show_notifier.adapters.NewMoviesListAdapter;
@@ -364,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         moviesRecyclerView.setAdapter(newMoviesListAdapter);
     }
 
-    private void displayToast(String s) {
+    public void displayToast(String s) {
         Toast.makeText(mContext,s,Toast.LENGTH_SHORT).show();
     }
 }

@@ -111,4 +111,9 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <include
+        layout= "@layout/fav_log_out_fab"
+        android:layout_width= "match_parent"
+        android:layout_height= "match_parent" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

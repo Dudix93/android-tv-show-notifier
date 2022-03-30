@@ -2,12 +2,14 @@ package com.example.android_tv_show_notifier.activities;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,7 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
+import com.example.android_tv_show_notifier.Entities.FavouriteEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.ActorsListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
@@ -31,6 +35,7 @@ import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +43,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -62,14 +68,22 @@ public class TitleActivity extends AppCompatActivity {
     private TitleModel titleModel;
     private TrailerModel trailerModel;
     private Drawable trailerThumbnailDrawable;
+    private Drawable fav_icon;
+    private Drawable unfav_icon;
     private RecyclerView actorsRecyclerView;
     private ArrayList<ActorModel> actorsArrayList;
+    private List<FavouriteEntity> favourites;
     private ActorsListAdapter actorsListAdapter;
+    private ExtendedFloatingActionButton favFAB;
+    private RoomDB roomDB;
+    private FavouriteEntity favouriteEntity;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_title);
+        this.mContext = getApplicationContext();
         this.intentExtras = getIntent().getExtras();
         this.titleNameTextView = findViewById(R.id.title_name);
         this.releaseYearTextView = findViewById(R.id.title_year);
@@ -78,7 +92,45 @@ public class TitleActivity extends AppCompatActivity {
         this.posterImageView = findViewById(R.id.movie_poster);
         this.collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         this.trailerThumbnailImageView = findViewById(R.id.trailer_thumbnail);
+        this.favFAB = findViewById(R.id.fav_fab);
+        this.roomDB = RoomDB.getInstance(getApplicationContext());
+        this.favourites = roomDB.favouriteDao().getAll();
+        this.fav_icon = AppCompatResources.getDrawable(mContext, R.drawable.ic_fav);
+        this.unfav_icon = AppCompatResources.getDrawable(mContext, R.drawable.ic_non_fav);
         fillTitleData();
+    }
+
+    public void handleFavButton() {
+        boolean isFavourite = isTitleListedAsFav();
+        favFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isFavourite) {
+                    roomDB.favouriteDao().insert(new FavouriteEntity(titleId));
+                    favFAB.setIcon(unfav_icon);
+                    favourites.add(favouriteEntity);
+                    displayToast(getString(R.string.fav_added));
+                }
+                else if (isFavourite) {
+                    roomDB.favouriteDao().delete(favouriteEntity);
+                    favFAB.setIcon(fav_icon);
+                    favourites.remove(favouriteEntity);
+                    displayToast(getString(R.string.fav_removed));
+                }
+            }
+        });
+    }
+
+
+    public boolean isTitleListedAsFav() {
+        for (FavouriteEntity fe : favourites) {
+            if (fe.favouriteId.equals(titleId)) {
+                favFAB.setIcon(unfav_icon);
+                favouriteEntity = fe;
+                return true;
+            }
+        }
+        return false;
     }
 
     public void getTitleData(String titleId) {
@@ -141,6 +193,7 @@ public class TitleActivity extends AppCompatActivity {
             this.imdbAPI = new RetrofitInstance().api;
             this.TitleAPICall = imdbAPI.getTitle(this.titleId);
             this.TrailerAPICall = imdbAPI.getTrailer(this.titleId);
+            handleFavButton();
             getTitleData(this.titleId);
         }
     }
@@ -219,5 +272,9 @@ public class TitleActivity extends AppCompatActivity {
             LayerDrawable layerDrawable = new LayerDrawable(layers);
             trailerThumbnailImageView.setImageDrawable(layerDrawable);
         }
+    }
+
+    private void displayToast(String s) {
+        Toast.makeText(mContext,s,Toast.LENGTH_SHORT).show();
     }
 }
