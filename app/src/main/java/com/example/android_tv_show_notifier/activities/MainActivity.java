@@ -25,15 +25,18 @@ import android.widget.TableLayout;
 import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.Database.RoomDB;
+import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.MostPopularMoviesListAdapter;
 import com.example.android_tv_show_notifier.adapters.NewMoviesListAdapter;
+import com.example.android_tv_show_notifier.adapters.TitlesListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataDetailModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
+import com.example.android_tv_show_notifier.models.TitleModel;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -63,11 +66,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private MostPopularMoviesListAdapter mostPopularMoviesListAdapter;
     private NewMoviesListAdapter newMoviesListAdapter;
+    private TitlesListAdapter titlesListAdapter;
     private Context mContext;
     private Call<MostPopularDataModel> MostPopularTVsAPICall;
     private Call<MostPopularDataModel> MostPopularMoviesAPICall;
     private Call<NewMovieDataModel> InTheatersAPICall;
     private Call<NewMovieDataModel> ComingSoonAPICall;
+    private Call<TitleModel> TitleAPICall;
     private ImdbAPI imdbAPI;
     private Toolbar toolbar;
     private Button btSignIn;
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActivityResultLauncher activityResultLauncher;
     private AuthCredential authCredential;
     private FirebaseUser firebaseUser;
+    private RoomDB roomDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,10 +93,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-        moviesRecyclerView = (RecyclerView) findViewById(R.id.movies);
+        this.moviesRecyclerView = (RecyclerView) findViewById(R.id.movies);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
-        moviesRecyclerView.setLayoutManager(mLayoutManager);
-        firebaseAuth = FirebaseAuth.getInstance();
+        this.moviesRecyclerView.setLayoutManager(mLayoutManager);
+        this.firebaseAuth = FirebaseAuth.getInstance();
         setToolbar();
         getMostPopularTVs();
         setGoogleSignIn();
@@ -305,6 +311,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public  void getFavourites() {
+        roomDB = RoomDB.getInstance(mContext);
+        ArrayList<FavouriteTitleEntity> favouriteTitlesIds = new ArrayList<FavouriteTitleEntity>(roomDB.favouriteDao().getAll());
+        ArrayList<TitleModel> favouriteTitles = new ArrayList<TitleModel>();
+        for (FavouriteTitleEntity ft : favouriteTitlesIds)  {
+            this.TitleAPICall = imdbAPI.getTitle(ft.favouriteId);
+            try {
+                TitleAPICall.enqueue(new Callback<TitleModel>() {
+                    @Override
+                    public void onResponse(Call<TitleModel> call, Response<TitleModel> response) {
+
+                        if (response.code() != 200) {
+                            displayToast(response.message());
+                        }
+                        else {
+                            if (response.body() != null) {
+                                favouriteTitles.add(response.body());
+                                setTitlesListAdapterListAdapter(favouriteTitles);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<TitleModel> call, Throwable t) {
+                        displayToast(t.getMessage());
+                    }
+                });
+            } catch (Exception e) {
+                displayToast(e.getMessage());
+            }
+        }
+    }
+
     public void setToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -349,6 +388,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getMostPopularTVs();
             if (toolbar != null) toolbar.setTitle(R.string.top_tv);
         }
+        else if (nav_item.equals(getResources().getString(R.string.favourites))) {
+            getFavourites();
+            if (toolbar != null) toolbar.setTitle(R.string.favourites);
+        }
 
         DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
         drawer.closeDrawer(GravityCompat. START ) ;
@@ -363,6 +406,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void setNewMoviesListAdapterListAdapter(ArrayList<NewMovieDataDetailModel> arrayList) {
         newMoviesListAdapter = new NewMoviesListAdapter(arrayList, mContext);
         moviesRecyclerView.setAdapter(newMoviesListAdapter);
+    }
+
+    public void setTitlesListAdapterListAdapter(ArrayList<TitleModel> arrayList) {
+        titlesListAdapter = new TitlesListAdapter(arrayList, mContext);
+        moviesRecyclerView.setAdapter(titlesListAdapter);
     }
 
     public void displayToast(String s) {

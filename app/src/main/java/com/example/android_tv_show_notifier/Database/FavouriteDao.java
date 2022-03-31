@@ -7,20 +7,21 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.android_tv_show_notifier.Entities.FavouriteEntity;
+import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
+
 import java.util.List;
 
 @Dao
 public interface FavouriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(FavouriteEntity... favourites);
+    void insert(FavouriteTitleEntity... favourites);
 
     @Update
-    void update(FavouriteEntity... favourite);
+    void update(FavouriteTitleEntity... favourite);
 
     @Delete
-    void delete(FavouriteEntity favourite);
+    void delete(FavouriteTitleEntity favourite);
 
     @Query("SELECT * FROM favourites")
-    List<FavouriteEntity> getAll();
+    List<FavouriteTitleEntity> getAll();
 }

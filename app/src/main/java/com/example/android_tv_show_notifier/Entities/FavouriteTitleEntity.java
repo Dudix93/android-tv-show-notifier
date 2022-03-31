@@ -5,14 +5,14 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "favourites")
-public class FavouriteEntity {
+public class FavouriteTitleEntity {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
     @ColumnInfo(name = "favouriteId")
     public String favouriteId;
 
-    public FavouriteEntity(String favouriteId) {
+    public FavouriteTitleEntity(String favouriteId) {
         this.favouriteId = favouriteId;
     }
 }

@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
-import com.example.android_tv_show_notifier.Entities.FavouriteEntity;
+import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.ActorsListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
@@ -72,11 +72,11 @@ public class TitleActivity extends AppCompatActivity {
     private Drawable unfav_icon;
     private RecyclerView actorsRecyclerView;
     private ArrayList<ActorModel> actorsArrayList;
-    private List<FavouriteEntity> favourites;
+    private List<FavouriteTitleEntity> favourites;
     private ActorsListAdapter actorsListAdapter;
     private ExtendedFloatingActionButton favFAB;
     private RoomDB roomDB;
-    private FavouriteEntity favouriteEntity;
+    private FavouriteTitleEntity favouriteTitleEntity;
     private Context mContext;
 
     @Override
@@ -106,15 +106,15 @@ public class TitleActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isFavourite) {
-                    roomDB.favouriteDao().insert(new FavouriteEntity(titleId));
+                    roomDB.favouriteDao().insert(new FavouriteTitleEntity(titleId));
                     favFAB.setIcon(unfav_icon);
-                    favourites.add(favouriteEntity);
+                    favourites.add(favouriteTitleEntity);
                     displayToast(getString(R.string.fav_added));
                 }
                 else if (isFavourite) {
-                    roomDB.favouriteDao().delete(favouriteEntity);
+                    roomDB.favouriteDao().delete(favouriteTitleEntity);
                     favFAB.setIcon(fav_icon);
-                    favourites.remove(favouriteEntity);
+                    favourites.remove(favouriteTitleEntity);
                     displayToast(getString(R.string.fav_removed));
                 }
             }
@@ -123,10 +123,10 @@ public class TitleActivity extends AppCompatActivity {
 
 
     public boolean isTitleListedAsFav() {
-        for (FavouriteEntity fe : favourites) {
+        for (FavouriteTitleEntity fe : favourites) {
             if (fe.favouriteId.equals(titleId)) {
                 favFAB.setIcon(unfav_icon);
-                favouriteEntity = fe;
+                favouriteTitleEntity = fe;
                 return true;
             }
         }
