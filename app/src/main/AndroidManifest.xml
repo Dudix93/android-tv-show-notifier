@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android_tv_show_notifier">
+    package="com.example.android_tv_show_notifier" >
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,7 +10,11 @@
         android:label="@string/top_tv"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Androidtvshownotifier">
+        android:theme="@style/Theme.Androidtvshownotifier" >
+        <activity
+            android:name=".activities.FavouriteActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Androidtvshownotifier.NoActionBar" />
         <activity
             android:name=".activities.TitleActivity"
             android:exported="false"
@@ -21,8 +25,8 @@
             android:theme="@style/Theme.Androidtvshownotifier.NoActionBar" />
         <activity
             android:name=".activities.MainActivity"
-            android:theme="@style/Theme.Androidtvshownotifier.NoActionBar"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Androidtvshownotifier.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

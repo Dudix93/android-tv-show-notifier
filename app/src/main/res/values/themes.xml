@@ -19,7 +19,4 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Androidtvshownotifier.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.Androidtvshownotifier.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

@@ -7,29 +7,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.activities.ActorActivity;
-import com.example.android_tv_show_notifier.activities.TitleActivity;
-import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.R;
 
 import java.util.ArrayList;
 
-public class ActorsListAdapter extends RecyclerView.Adapter<ActorsListAdapter.ActorViewHolder> {
+public class ActorsHorizontalListAdapter extends RecyclerView.Adapter<ActorsHorizontalListAdapter.ActorViewHolder> {
 
     private ArrayList<ActorModel> mActors = new ArrayList<ActorModel>();
     private Context mContext;
 
-    public ActorsListAdapter(ArrayList<ActorModel> actors, Context context) {
+    public ActorsHorizontalListAdapter(ArrayList<ActorModel> actors, Context context) {
         this.mActors = actors;
         this.mContext = context;
     }
@@ -51,7 +46,7 @@ public class ActorsListAdapter extends RecyclerView.Adapter<ActorsListAdapter.Ac
     @Override
     public ActorViewHolder onCreateViewHolder(ViewGroup viewGroup, int viwType) {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_actor, viewGroup, false);
+                .inflate(R.layout.item_actor_horizontal, viewGroup, false);
         return new ActorViewHolder(view);
     }
 

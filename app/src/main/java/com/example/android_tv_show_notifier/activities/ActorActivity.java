@@ -83,7 +83,7 @@ public class ActorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isFavourite) {
-                    roomDB.favouriteActorDao().insert(new FavouriteActorEntity(actorId));
+                    roomDB.favouriteActorDao().insert(new FavouriteActorEntity(nameModel.getId(), nameModel.getName(), nameModel.getImage()));
                     favFAB.setIcon(unfav_icon);
                     favouriteActors.add(favouriteActorEntity);
                     displayToast(getString(R.string.fav_added));
@@ -101,7 +101,7 @@ public class ActorActivity extends AppCompatActivity {
 
     public boolean isTitleListedAsFav() {
         for (FavouriteActorEntity fe : favouriteActors) {
-            if (fe.favouriteId.equals(actorId)) {
+            if (fe.actor_id.equals(actorId)) {
                 favFAB.setIcon(unfav_icon);
                 favouriteActorEntity = fe;
                 return true;

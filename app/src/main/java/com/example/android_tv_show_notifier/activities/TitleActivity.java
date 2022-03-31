@@ -28,7 +28,7 @@ import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
-import com.example.android_tv_show_notifier.adapters.ActorsListAdapter;
+import com.example.android_tv_show_notifier.adapters.ActorsHorizontalListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.ActorModel;
@@ -73,7 +73,7 @@ public class TitleActivity extends AppCompatActivity {
     private RecyclerView actorsRecyclerView;
     private ArrayList<ActorModel> actorsArrayList;
     private List<FavouriteTitleEntity> favouriteTitles;
-    private ActorsListAdapter actorsListAdapter;
+    private ActorsHorizontalListAdapter actorsHorizontalListAdapter;
     private ExtendedFloatingActionButton favFAB;
     private RoomDB roomDB;
     private FavouriteTitleEntity favouriteTitleEntity;
@@ -106,7 +106,7 @@ public class TitleActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isFavourite) {
-                    roomDB.favouriteTitleDao().insert(new FavouriteTitleEntity(titleId));
+                    roomDB.favouriteTitleDao().insert(new FavouriteTitleEntity(titleModel.getId(), titleModel.getTitle(), Integer.parseInt(titleModel.getYear()), titleModel.getImage()));
                     favFAB.setIcon(unfav_icon);
                     favouriteTitles.add(favouriteTitleEntity);
                     displayToast(getString(R.string.fav_added));
@@ -124,7 +124,7 @@ public class TitleActivity extends AppCompatActivity {
 
     public boolean isTitleListedAsFav() {
         for (FavouriteTitleEntity fe : favouriteTitles) {
-            if (fe.favouriteId.equals(titleId)) {
+            if (fe.title_id.equals(titleId)) {
                 favFAB.setIcon(unfav_icon);
                 favouriteTitleEntity = fe;
                 return true;
@@ -233,8 +233,8 @@ public class TitleActivity extends AppCompatActivity {
         actorsRecyclerView = (RecyclerView) findViewById(R.id.actors_list);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         actorsRecyclerView.setLayoutManager(mLayoutManager);
-        actorsListAdapter = new ActorsListAdapter(actorsArrayList, getApplicationContext());
-        actorsRecyclerView.setAdapter(actorsListAdapter);    
+        actorsHorizontalListAdapter = new ActorsHorizontalListAdapter(actorsArrayList, getApplicationContext());
+        actorsRecyclerView.setAdapter(actorsHorizontalListAdapter);
     }
     
     private static class ThumbnailAsyncTask extends AsyncTask<String, Integer, Drawable> {
