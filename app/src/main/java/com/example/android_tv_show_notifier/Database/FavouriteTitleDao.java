@@ -12,7 +12,7 @@ import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import java.util.List;
 
 @Dao
-public interface FavouriteDao {
+public interface FavouriteTitleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(FavouriteTitleEntity... favourites);
 
@@ -22,6 +22,6 @@ public interface FavouriteDao {
     @Delete
     void delete(FavouriteTitleEntity favourite);
 
-    @Query("SELECT * FROM favourites")
+    @Query("SELECT * FROM favouriteTitles")
     List<FavouriteTitleEntity> getAll();
 }

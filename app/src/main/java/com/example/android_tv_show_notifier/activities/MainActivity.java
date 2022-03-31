@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public  void getFavourites() {
         roomDB = RoomDB.getInstance(mContext);
-        ArrayList<FavouriteTitleEntity> favouriteTitlesIds = new ArrayList<FavouriteTitleEntity>(roomDB.favouriteDao().getAll());
+        ArrayList<FavouriteTitleEntity> favouriteTitlesIds = new ArrayList<FavouriteTitleEntity>(roomDB.favouriteTitleDao().getAll());
         ArrayList<TitleModel> favouriteTitles = new ArrayList<TitleModel>();
         for (FavouriteTitleEntity ft : favouriteTitlesIds)  {
             this.TitleAPICall = imdbAPI.getTitle(ft.favouriteId);
