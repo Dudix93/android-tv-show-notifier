@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android_tv_show_notifier.Database.FirebaseDB;
 import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
@@ -36,6 +37,8 @@ import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +81,7 @@ public class TitleActivity extends AppCompatActivity {
     private RoomDB roomDB;
     private FavouriteTitleEntity favouriteTitleEntity;
     private Context mContext;
+    private FirebaseDB firebaseDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,11 +106,23 @@ public class TitleActivity extends AppCompatActivity {
 
     public void handleFavButton() {
         boolean isFavourite = isTitleListedAsFav();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            firebaseDB = new FirebaseDB(user.getUid());
+        }
         favFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!isFavourite) {
-                    roomDB.favouriteTitleDao().insert(new FavouriteTitleEntity(titleModel.getId(), titleModel.getTitle(), Integer.parseInt(titleModel.getYear()), titleModel.getImage()));
+                    FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
+                            titleModel.getTitle(),
+                            Integer.parseInt(titleModel.getYear()),
+                            titleModel.getImage());
+                    if (user != null) {
+                       firebaseDB.insertTitle(favouriteTitleEntity);
+                    } else {
+                        roomDB.favouriteTitleDao().insert(favouriteTitleEntity);
+                    }
                     favFAB.setIcon(unfav_icon);
                     favouriteTitles.add(favouriteTitleEntity);
                     displayToast(getString(R.string.fav_added));
