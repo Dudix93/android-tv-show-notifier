@@ -44,7 +44,7 @@ public class FirebaseDB {
     }
 
     public void insertActor (FavouriteActorEntity favouriteActorEntity) {
-        this.firebaseDBRef.child(this.userId).child("favourite actors").setValue(favouriteActorEntity);
+        this.favouriteActorsRef.push().setValue(favouriteActorEntity);
     }
 
     public void deleteTitle (FavouriteTitleEntity favouriteTitleEntity) {

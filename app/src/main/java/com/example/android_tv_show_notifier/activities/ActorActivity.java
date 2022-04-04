@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android_tv_show_notifier.Database.FirebaseDB;
 import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
@@ -24,6 +25,8 @@ import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.KnownForModel;
 import com.example.android_tv_show_notifier.models.NameModel;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +55,7 @@ public class ActorActivity extends AppCompatActivity {
     private FavouriteActorEntity favouriteActorEntity;
     private Drawable fav_icon;
     private Drawable unfav_icon;
+    private FirebaseDB firebaseDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +83,20 @@ public class ActorActivity extends AppCompatActivity {
 
     public void handleFavButton() {
         boolean isFavourite = isTitleListedAsFav();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            firebaseDB = new FirebaseDB(user.getUid());
+        }
         favFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!isFavourite) {
+                    FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(), nameModel.getName(), nameModel.getImage());
+                    if (user != null) {
+                        firebaseDB.insertActor(favouriteActorEntity);
+                    } else {
+                        roomDB.favouriteActorDao().insert(favouriteActorEntity);
+                    }
                     roomDB.favouriteActorDao().insert(new FavouriteActorEntity(nameModel.getId(), nameModel.getName(), nameModel.getImage()));
                     favFAB.setIcon(unfav_icon);
                     favouriteActors.add(favouriteActorEntity);
