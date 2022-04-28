@@ -39,6 +39,8 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +48,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -75,6 +78,7 @@ public class TitleActivity extends AppCompatActivity {
     private Drawable unfav_icon;
     private RecyclerView actorsRecyclerView;
     private ArrayList<ActorModel> actorsArrayList;
+    private ArrayList<String> favTitles;
     private List<FavouriteTitleEntity> favouriteTitles;
     private ActorsHorizontalListAdapter actorsHorizontalListAdapter;
     private ExtendedFloatingActionButton favFAB;
@@ -82,6 +86,9 @@ public class TitleActivity extends AppCompatActivity {
     private FavouriteTitleEntity favouriteTitleEntity;
     private Context mContext;
     private FirebaseDB firebaseDB;
+    private FirebaseUser user;
+    private boolean isFavourite;
+    private DatabaseReference titleReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,43 +105,77 @@ public class TitleActivity extends AppCompatActivity {
         this.trailerThumbnailImageView = findViewById(R.id.trailer_thumbnail);
         this.favFAB = findViewById(R.id.fav_fab);
         this.roomDB = RoomDB.getInstance(getApplicationContext());
-        this.favouriteTitles = roomDB.favouriteTitleDao().getAll();
         this.fav_icon = AppCompatResources.getDrawable(mContext, R.drawable.ic_fav);
         this.unfav_icon = AppCompatResources.getDrawable(mContext, R.drawable.ic_non_fav);
         fillTitleData();
     }
 
     public void handleFavButton() {
-        boolean isFavourite = isTitleListedAsFav();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             firebaseDB = new FirebaseDB(user.getUid());
-        }
-        favFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!isFavourite) {
-                    FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
-                            titleModel.getTitle(),
-                            Integer.parseInt(titleModel.getYear()),
-                            titleModel.getImage());
-                    if (user != null) {
-                       firebaseDB.insertTitle(favouriteTitleEntity);
-                    } else {
-                        roomDB.favouriteTitleDao().insert(favouriteTitleEntity);
-                    }
-                    favFAB.setIcon(unfav_icon);
-                    favouriteTitles.add(favouriteTitleEntity);
-                    displayToast(getString(R.string.fav_added));
-                }
-                else if (isFavourite) {
-                    roomDB.favouriteTitleDao().delete(favouriteTitleEntity);
+            firebaseDB.getFavouriteTitles(new FirebaseDB.DataCallback() {
+                @Override
+                public void callback(DataSnapshot snapshot) {
+                    isFavourite = false;
                     favFAB.setIcon(fav_icon);
-                    favouriteTitles.remove(favouriteTitleEntity);
-                    displayToast(getString(R.string.fav_removed));
+                    for (DataSnapshot sshot : snapshot.getChildren()) {
+                        HashMap value = (HashMap)sshot.getValue();
+                        if (titleId.equals((String)value.get("titleId"))) {
+                            isFavourite = true;
+                            titleReference = sshot.getRef();
+                            favFAB.setIcon(unfav_icon);
+                            break;
+                        }
+                    }
+                    favFAB.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (!isFavourite) {
+                                FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
+                                        titleModel.getTitle(),
+                                        Integer.parseInt(titleModel.getYear()),
+                                        titleModel.getImage());
+                                firebaseDB.insertTitle(favouriteTitleEntity);
+                                favFAB.setIcon(unfav_icon);
+                                displayToast(getString(R.string.fav_added));
+                            }
+                            else if (isFavourite) {
+                                titleReference.removeValue();
+                                favFAB.setIcon(fav_icon);
+                                displayToast(getString(R.string.fav_removed));
+                            }
+                        }
+                    });
                 }
-            }
-        });
+            });
+        }
+        else {
+            this.favouriteTitles = roomDB.favouriteTitleDao().getAll();
+            isFavourite = isTitleListedAsFav();
+            favFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (!isFavourite) {
+                        FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
+                                titleModel.getTitle(),
+                                Integer.parseInt(titleModel.getYear()),
+                                titleModel.getImage());
+                        roomDB.favouriteTitleDao().insert(favouriteTitleEntity);
+                        favFAB.setIcon(unfav_icon);
+                        favouriteTitles.add(favouriteTitleEntity);
+                        displayToast(getString(R.string.fav_added));
+                    }
+                    else if (isFavourite) {
+                        roomDB.favouriteTitleDao().delete(favouriteTitleEntity);
+                        favFAB.setIcon(fav_icon);
+                        favouriteTitles.remove(favouriteTitleEntity);
+                        displayToast(getString(R.string.fav_removed));
+                    }
+                }
+            });
+        }
     }
 
 
