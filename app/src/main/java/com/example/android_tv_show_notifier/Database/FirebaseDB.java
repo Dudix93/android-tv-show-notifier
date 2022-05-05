@@ -74,6 +74,19 @@ public class FirebaseDB {
         });
     }
 
+    public void getFavouriteActors(DataCallback dataCallback) {
+        this.firebaseDBRef = FirebaseDatabase.getInstance().getReference();
+        favouriteActorsRef = firebaseDBRef.child(userId).child("favourite actors").getRef();
+        favouriteActorsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                dataCallback.callback(snapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
     public interface DataCallback {
         void callback(DataSnapshot snapshot);
     }

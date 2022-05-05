@@ -17,7 +17,7 @@ import com.example.android_tv_show_notifier.Database.FirebaseDB;
 import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
-import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
+import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.KnownForListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
@@ -27,8 +27,11 @@ import com.example.android_tv_show_notifier.models.NameModel;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -47,6 +50,7 @@ public class ActorActivity extends AppCompatActivity {
     private Call<NameModel> actorAPICall;
     private ImdbAPI imdbAPI;
     private ArrayList<KnownForModel> knownForArrayList;
+    private ArrayList<String> favTitles;
     private List<FavouriteActorEntity> favouriteActors;
     private RecyclerView knownForRecyclerView;
     private Context mContext;
@@ -56,6 +60,9 @@ public class ActorActivity extends AppCompatActivity {
     private Drawable fav_icon;
     private Drawable unfav_icon;
     private FirebaseDB firebaseDB;
+    private FirebaseUser user;
+    private boolean isFavourite;
+    private DatabaseReference titleReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,38 +89,75 @@ public class ActorActivity extends AppCompatActivity {
     }
 
     public void handleFavButton() {
-        boolean isFavourite = isTitleListedAsFav();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             firebaseDB = new FirebaseDB(user.getUid());
-        }
-        favFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!isFavourite) {
-                    FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(), nameModel.getName(), nameModel.getImage());
-                    if (user != null) {
-                        firebaseDB.insertActor(favouriteActorEntity);
-                    } else {
-                        roomDB.favouriteActorDao().insert(favouriteActorEntity);
-                    }
-                    roomDB.favouriteActorDao().insert(new FavouriteActorEntity(nameModel.getId(), nameModel.getName(), nameModel.getImage()));
-                    favFAB.setIcon(unfav_icon);
-                    favouriteActors.add(favouriteActorEntity);
-                    displayToast(getString(R.string.fav_added));
-                }
-                else if (isFavourite) {
-                    roomDB.favouriteActorDao().delete(favouriteActorEntity);
+            firebaseDB.getFavouriteActors(new FirebaseDB.DataCallback() {
+                @Override
+                public void callback(DataSnapshot snapshot) {
+                    isFavourite = false;
                     favFAB.setIcon(fav_icon);
-                    favouriteActors.remove(favouriteActorEntity);
-                    displayToast(getString(R.string.fav_removed));
+                    for (DataSnapshot sshot : snapshot.getChildren()) {
+                        HashMap value = (HashMap)sshot.getValue();
+                        if (actorId.equals((String)value.get("actorId"))) {
+                            isFavourite = true;
+                            titleReference = sshot.getRef();
+                            favFAB.setIcon(unfav_icon);
+                            break;
+                        }
+                    }
+                    favFAB.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (!isFavourite) {
+                                FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(),
+                                        nameModel.getName(),
+                                        nameModel.getImage());
+                                firebaseDB.insertActor(favouriteActorEntity);
+                                favFAB.setIcon(unfav_icon);
+                                displayToast(getString(R.string.fav_added));
+                            }
+                            else if (isFavourite) {
+                                titleReference.removeValue();
+                                favFAB.setIcon(fav_icon);
+                                displayToast(getString(R.string.fav_removed));
+                            }
+                        }
+                    });
                 }
-            }
-        });
+            });
+        }
+        else {
+            this.favouriteActors = roomDB.favouriteActorDao().getAll();
+            isFavourite = isActorListedAsFav();
+            favFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (!isFavourite) {
+                        FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(),
+                                nameModel.getName(),
+                                nameModel.getImage());
+                        roomDB.favouriteActorDao().insert(favouriteActorEntity);
+                        favFAB.setIcon(unfav_icon);
+                        favouriteActors.add(favouriteActorEntity);
+                        displayToast(getString(R.string.fav_added));
+                    }
+
+                    else if (isFavourite) {
+                        roomDB.favouriteActorDao().delete(favouriteActorEntity);
+                        favFAB.setIcon(fav_icon);
+                        favouriteActors.remove(favouriteActorEntity);
+                        displayToast(getString(R.string.fav_removed));
+                    }
+                }
+            });
+        }
     }
 
 
-    public boolean isTitleListedAsFav() {
+
+    public boolean isActorListedAsFav() {
         for (FavouriteActorEntity fe : favouriteActors) {
             if (fe.actor_id.equals(actorId)) {
                 favFAB.setIcon(unfav_icon);

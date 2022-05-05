@@ -163,39 +163,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (((ActivityResult)result).getData() != null) {
                     Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn.getSignedInAccountFromIntent(((ActivityResult)result).getData());
 
-                    if(signInAccountTask.isSuccessful())
-                    {
-                        try {
-                            GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
-                            if(googleSignInAccount != null)
-                            {
-                                authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(),null);
-                                firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if(task.isSuccessful())
+                    try {
+                        GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
+                        if(googleSignInAccount != null)
+                        {
+                            authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(),null);
+                            firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(task.isSuccessful())
+                                    {
+                                        setLogOutOnClickListener();
+                                        firebaseAuth = FirebaseAuth.getInstance();
+                                        firebaseUser = firebaseAuth.getCurrentUser();
+                                        if (firebaseUser != null)
                                         {
-                                            setLogOutOnClickListener();
-                                            firebaseAuth = FirebaseAuth.getInstance();
-                                            firebaseUser = firebaseAuth.getCurrentUser();
-                                            if (firebaseUser != null)
-                                            {
-                                                displayToast("Hi " + firebaseUser.getDisplayName());
-                                                btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            displayToast("Authentication Failed :"+task.getException().getMessage());
+                                            displayToast("Hi " + firebaseUser.getDisplayName());
+                                            btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
                                         }
                                     }
-                                });
-                            }
+                                    else
+                                    {
+                                        displayToast("Authentication Failed :"+task.getException().getMessage());
+                                    }
+                                }
+                            });
                         }
-                        catch (ApiException e)
-                        {
-                            e.printStackTrace();
-                        }
+                    }
+                    catch (ApiException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    if(signInAccountTask.isSuccessful())
+                    {
                     }
                 }
             }
