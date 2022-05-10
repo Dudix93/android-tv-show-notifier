@@ -11,4 +11,6 @@
     <string name="favourites">Favourites</string>
     <string name="favourite_titles">Favourite Titles</string>
     <string name="favourite_actors">Favourite Actors</string>
+    <string name="actors">Actors</string>
+    <string name="titles">Titles</string>
 </resources>

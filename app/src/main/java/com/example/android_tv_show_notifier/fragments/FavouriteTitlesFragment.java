@@ -13,15 +13,16 @@ import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.FavouriteTitlesListAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FavouriteTitlesFragment extends Fragment {
 
     private View layoutView;
     private FavouriteTitlesListAdapter titlesListAdapter;
-    private ArrayList<FavouriteTitleEntity> favouriteTitlesArrayList;
+    private List<FavouriteTitleEntity> favouriteTitlesArrayList;
     private RecyclerView moviesRecyclerView;
 
-    public FavouriteTitlesFragment(ArrayList<FavouriteTitleEntity> favouriteTitlesArrayList) {
+    public FavouriteTitlesFragment(List<FavouriteTitleEntity> favouriteTitlesArrayList) {
         this.favouriteTitlesArrayList = favouriteTitlesArrayList;
     }
 

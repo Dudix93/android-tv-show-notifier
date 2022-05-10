@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "147928523431",
+    "firebase_url": "https://android-tv-notifier-default-rtdb.firebaseio.com",
     "project_id": "android-tv-notifier",
     "storage_bucket": "android-tv-notifier.appspot.com"
   },
@@ -14,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "147928523431-5pm0uula17m5b92949mfegqkpmm4u56j.apps.googleusercontent.com",
+          "client_id": "147928523431-21vbrhros8d7t7ii97ejhpmqvdoqmlrc.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.android_tv_show_notifier",
-            "certificate_hash": "d0b2f7088a068764f739e47c9894c3f63c3e29be"
+            "certificate_hash": "d8e950819efcd26209b5a00f0bcccd4167657347"
           }
         },
         {

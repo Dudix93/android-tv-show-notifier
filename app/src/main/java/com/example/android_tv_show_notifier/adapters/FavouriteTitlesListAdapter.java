@@ -18,13 +18,14 @@ import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.TitleActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FavouriteTitlesListAdapter extends RecyclerView.Adapter<FavouriteTitlesListAdapter.TitleViewHolder> {
 
-    private ArrayList<FavouriteTitleEntity> mTitles = new ArrayList<FavouriteTitleEntity>();
+    private List<FavouriteTitleEntity> mTitles = new ArrayList<FavouriteTitleEntity>();
     private Context mContext;
 
-    public FavouriteTitlesListAdapter(ArrayList<FavouriteTitleEntity> titles, Context context) {
+    public FavouriteTitlesListAdapter(List<FavouriteTitleEntity> titles, Context context) {
         this.mTitles = titles;
         this.mContext = context;
     }
@@ -61,7 +62,7 @@ public class FavouriteTitlesListAdapter extends RecyclerView.Adapter<FavouriteTi
     @Override
     public void onBindViewHolder(TitleViewHolder viewHolder, final int position) {
         viewHolder.getTitleTextView().setText(this.mTitles.get(position).getTitle());
-        viewHolder.getReleaseYearTextView().setText(Integer.toString(this.mTitles.get(position).getReleaseYear()));
+        viewHolder.getReleaseYearTextView().setText(Long.toString(this.mTitles.get(position).getReleaseYear()));
         Glide.with(this.mContext)
                 .load(this.mTitles.get(position).getPosterUrl())
                 .apply(new RequestOptions().override(200, 300))

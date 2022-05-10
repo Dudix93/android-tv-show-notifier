@@ -1,41 +1,102 @@
 package com.example.android_tv_show_notifier.activities;
 
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+
+import com.example.android_tv_show_notifier.Database.FirebaseDB;
+import com.example.android_tv_show_notifier.Database.RoomDB;
+import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.android_tv_show_notifier.adapters.FavouritesPagerAdapter;
+import com.example.android_tv_show_notifier.fragments.FavouriteActorsFragment;
+import com.example.android_tv_show_notifier.fragments.FavouriteTitlesFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class FavouriteActivity extends AppCompatActivity {
 
-    TabLayout tabLayout;
-    ViewPager viewPager;
+    private FavouriteTitlesFragment favouriteTitlesFragment;
+    private FavouriteActorsFragment favouriteActorsFragment;
+    private BottomNavigationView bottomNavigationView;
+    private List<FavouriteTitleEntity> favouriteTitlesArrayList;
+    private FirebaseUser user;
+    private FirebaseDB firebaseDB;
+    private RoomDB roomDB;
+    private FragmentManager fragmentManager;
+    private NavigationBarView.OnItemSelectedListener onItemSelectedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.favourites_tab_layout);
-        tabLayout = findViewById(R.id.favourites_tab_layout);
-        viewPager = findViewById(R.id.favourites_view_pager);
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.favourite_titles)));
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.favourite_actors)));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        final FavouritesPagerAdapter adapter = new FavouritesPagerAdapter(this,getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        bottomNavigationView = findViewById(R.id.bottom_navigation_favourites);
+        favouriteTitlesArrayList = new ArrayList<FavouriteTitleEntity>();
+        fragmentManager = getSupportFragmentManager();
+        loadFavouriteTitles();
+//        favouriteActorsFragment = new FavouriteActorsFragment();
+    }
+
+    public void loadFavouriteTitles() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            firebaseDB = new FirebaseDB(user.getUid());
+            firebaseDB.getFavouriteTitles(new FirebaseDB.DataCallback() {
+                @Override
+                public void callback(DataSnapshot snapshot) {
+                    for (DataSnapshot sshot : snapshot.getChildren()) {
+                        HashMap value = (HashMap) sshot.getValue();
+                        favouriteTitlesArrayList.add(new FavouriteTitleEntity(
+                                (String) value.get("titleId"),
+                                (String) value.get("title"),
+                                (Long) value.get("releaseYear"),
+                                (String) value.get("posterUrl")
+                        ));
+                    }
+                    favouriteTitlesFragment = new FavouriteTitlesFragment(favouriteTitlesArrayList);
+                    setOnItemSelectedListener(bottomNavigationView);
+                }
+            });
+        }
+        else if (user == null) {
+            roomDB = RoomDB.getInstance(getApplicationContext());
+            favouriteTitlesArrayList = roomDB.favouriteTitleDao().getAll();
+            bottomNavigationView.setSelectedItemId(R.id.favourite_titles);
+            favouriteTitlesFragment = new FavouriteTitlesFragment(favouriteTitlesArrayList);
+            setOnItemSelectedListener(bottomNavigationView);
+        }
+    }
+
+    public void setOnItemSelectedListener(BottomNavigationView bnv) {
+        bnv.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch(item.getItemId()) {
+                    case R.id.favourite_titles:
+                        fragmentManager.beginTransaction().replace(R.id.favourites_fragment, favouriteTitlesFragment).commit();
+                        return true;
+//                    case R.id.favourite_actors:
+//                        fragmentManager.beginTransaction().replace(R.id.favourites_fragment, R.id.favourite_actors).commit();
+//                        return true;
+                }
+                return false;
             }
         });
+        bnv.setSelectedItemId(R.id.favourite_titles);
     }
 }

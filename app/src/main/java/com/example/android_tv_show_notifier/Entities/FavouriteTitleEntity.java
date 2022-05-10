@@ -13,10 +13,10 @@ public class FavouriteTitleEntity {
     public String title_id;
     public String title;
     public String poster_url;
-    public int release_year;
+    public long release_year;
 
 
-    public FavouriteTitleEntity(String title_id, String title, int release_year, String poster_url) {
+    public FavouriteTitleEntity(String title_id, String title, long release_year, String poster_url) {
         this.title_id = title_id;
         this.title = title;
         this.release_year = release_year;
@@ -31,7 +31,7 @@ public class FavouriteTitleEntity {
         return title;
     }
 
-    public int getReleaseYear() {
+    public long getReleaseYear() {
         return release_year;
     }
 
