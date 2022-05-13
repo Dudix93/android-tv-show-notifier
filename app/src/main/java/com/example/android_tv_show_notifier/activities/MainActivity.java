@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-        this.moviesRecyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
+        this.moviesRecyclerView = (RecyclerView) findViewById(R.id.vertical_recycler_view);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
         this.moviesRecyclerView.setLayoutManager(mLayoutManager);
         this.firebaseAuth = FirebaseAuth.getInstance();

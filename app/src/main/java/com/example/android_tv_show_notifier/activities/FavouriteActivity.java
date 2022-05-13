@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.example.android_tv_show_notifier.Database.FirebaseDB;
 import com.example.android_tv_show_notifier.Database.RoomDB;
+import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
 import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
 
@@ -35,6 +36,7 @@ public class FavouriteActivity extends AppCompatActivity {
     private FavouriteActorsFragment favouriteActorsFragment;
     private BottomNavigationView bottomNavigationView;
     private List<FavouriteTitleEntity> favouriteTitlesArrayList;
+    private List<FavouriteActorEntity> favouriteActorsArrayList;
     private FirebaseUser user;
     private FirebaseDB firebaseDB;
     private RoomDB roomDB;
@@ -47,9 +49,9 @@ public class FavouriteActivity extends AppCompatActivity {
         setContentView(R.layout.favourites_tab_layout);
         bottomNavigationView = findViewById(R.id.bottom_navigation_favourites);
         favouriteTitlesArrayList = new ArrayList<FavouriteTitleEntity>();
+        favouriteActorsArrayList = new ArrayList<FavouriteActorEntity>();
         fragmentManager = getSupportFragmentManager();
         loadFavouriteTitles();
-//        favouriteActorsFragment = new FavouriteActorsFragment();
     }
 
     public void loadFavouriteTitles() {
@@ -69,7 +71,7 @@ public class FavouriteActivity extends AppCompatActivity {
                         ));
                     }
                     favouriteTitlesFragment = new FavouriteTitlesFragment(favouriteTitlesArrayList);
-                    setOnItemSelectedListener(bottomNavigationView);
+                    loadFavouriteActors();
                 }
             });
         }
@@ -78,6 +80,35 @@ public class FavouriteActivity extends AppCompatActivity {
             favouriteTitlesArrayList = roomDB.favouriteTitleDao().getAll();
             bottomNavigationView.setSelectedItemId(R.id.favourite_titles);
             favouriteTitlesFragment = new FavouriteTitlesFragment(favouriteTitlesArrayList);
+            loadFavouriteActors();
+        }
+    }
+
+    public void loadFavouriteActors() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            firebaseDB = new FirebaseDB(user.getUid());
+            firebaseDB.getFavouriteActors(new FirebaseDB.DataCallback() {
+                @Override
+                public void callback(DataSnapshot snapshot) {
+                    for (DataSnapshot sshot : snapshot.getChildren()) {
+                        HashMap value = (HashMap) sshot.getValue();
+                        favouriteActorsArrayList.add(new FavouriteActorEntity(
+                                (String) value.get("actorId"),
+                                (String) value.get("name"),
+                                (String) value.get("photoUrl")
+                        ));
+                    }
+                    favouriteActorsFragment = new FavouriteActorsFragment(favouriteActorsArrayList);
+                    setOnItemSelectedListener(bottomNavigationView);
+                }
+            });
+        }
+        else if (user == null) {
+            roomDB = RoomDB.getInstance(getApplicationContext());
+            favouriteActorsArrayList = roomDB.favouriteActorDao().getAll();
+            bottomNavigationView.setSelectedItemId(R.id.favourite_actors);
+            favouriteActorsFragment = new FavouriteActorsFragment(favouriteActorsArrayList);
             setOnItemSelectedListener(bottomNavigationView);
         }
     }
@@ -90,9 +121,9 @@ public class FavouriteActivity extends AppCompatActivity {
                     case R.id.favourite_titles:
                         fragmentManager.beginTransaction().replace(R.id.favourites_fragment, favouriteTitlesFragment).commit();
                         return true;
-//                    case R.id.favourite_actors:
-//                        fragmentManager.beginTransaction().replace(R.id.favourites_fragment, R.id.favourite_actors).commit();
-//                        return true;
+                    case R.id.favourite_actors:
+                        fragmentManager.beginTransaction().replace(R.id.favourites_fragment, favouriteActorsFragment).commit();
+                        return true;
                 }
                 return false;
             }

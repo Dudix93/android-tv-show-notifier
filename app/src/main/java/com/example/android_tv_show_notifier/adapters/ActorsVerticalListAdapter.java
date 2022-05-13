@@ -18,52 +18,51 @@ import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.ActorActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ActorsVerticalListAdapter extends RecyclerView.Adapter<ActorsVerticalListAdapter.MovieViewHolder> {
+public class ActorsVerticalListAdapter extends RecyclerView.Adapter<ActorsVerticalListAdapter.ActorViewHolder> {
 
-    private ArrayList<FavouriteActorEntity> mActors = new ArrayList<FavouriteActorEntity>();
+    private List<FavouriteActorEntity> mActors;
     private Context mContext;
 
-    public ActorsVerticalListAdapter(ArrayList<FavouriteActorEntity> movies, Context context) {
-        this.mActors = movies;
+    public ActorsVerticalListAdapter(List<FavouriteActorEntity> actors, Context context) {
+        this.mActors = actors;
         this.mContext = context;
     }
 
-    public static class MovieViewHolder extends RecyclerView.ViewHolder {
-        CardView titleCardView;
+    public static class ActorViewHolder extends RecyclerView.ViewHolder {
+        CardView actorCardView;
         TextView actorNameTextView;
         ImageView actorPhotoImageView;
 
-        public MovieViewHolder(View view) {
+        public ActorViewHolder(View view) {
             super(view);
-            this.titleCardView = view.findViewById(R.id.title_list_item);
+            this.actorCardView = view.findViewById(R.id.title_list_item);
             this.actorNameTextView = view.findViewById(R.id.title);
             this.actorPhotoImageView = view.findViewById(R.id.movie_poster);
         }
 
-        public CardView getTitleCardView() {
-            return this.titleCardView;
-        }
-        public TextView getTitleTextView() { return this.actorNameTextView; }
-        public ImageView getMoviePosterImageView() { return this.actorPhotoImageView; }
+        public CardView getActorCardView() { return this.actorCardView; }
+        public TextView getActorTextView() { return this.actorNameTextView; }
+        public ImageView getActorPhotoImageView() { return this.actorPhotoImageView; }
     }
 
     @Override
-    public MovieViewHolder onCreateViewHolder(ViewGroup viewGroup, int viwType) {
+    public ActorViewHolder onCreateViewHolder(ViewGroup viewGroup, int viwType) {
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.item_movie, viewGroup, false);
-        return new MovieViewHolder(view);
+        return new ActorViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(MovieViewHolder viewHolder, final int position) {
-        viewHolder.getTitleTextView().setText(this.mActors.get(position).getName());
+    public void onBindViewHolder(ActorViewHolder viewHolder, final int position) {
+        viewHolder.getActorTextView().setText(this.mActors.get(position).getName());
         Glide.with(this.mContext)
                 .load(this.mActors.get(position).getPhotoUrl())
                 .apply(new RequestOptions().override(200, 300))
-                .into(viewHolder.getMoviePosterImageView());
+                .into(viewHolder.getActorPhotoImageView());
 
-        viewHolder.getTitleCardView().setOnClickListener(new View.OnClickListener() {
+        viewHolder.getActorCardView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent actorIntent = new Intent(view.getContext(), ActorActivity.class);
