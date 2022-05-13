@@ -12,6 +12,7 @@ import com.example.android_tv_show_notifier.R;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
@@ -51,7 +52,20 @@ public class FavouriteActivity extends AppCompatActivity {
         favouriteTitlesArrayList = new ArrayList<FavouriteTitleEntity>();
         favouriteActorsArrayList = new ArrayList<FavouriteActorEntity>();
         fragmentManager = getSupportFragmentManager();
+        setupToolbarNavIcon();
         loadFavouriteTitles();
+    }
+
+    public void setupToolbarNavIcon() {
+        Toolbar toolbar = findViewById(R.id.favourites_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     public void loadFavouriteTitles() {

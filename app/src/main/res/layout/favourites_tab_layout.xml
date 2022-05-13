@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,50 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".activities.FavouriteActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/favourites_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="@string/favourites"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
     <FrameLayout
         android:id="@+id/favourites_fragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_favourites"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_navigation_favourites"
+        android:layout_below="@+id/favourites_toolbar"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_favourites"
         android:layout_width="match_parent"
         android:layout_height="75dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_alignParentBottom="true"
         app:menu="@menu/bottom_nav_menu_fav"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout-->
-<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    tools:context=".activities.ActorActivity">-->
-
-<!--    <androidx.viewpager.widget.ViewPager-->
-<!--        android:id="@+id/favourites_view_pager"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_above="@id/bottom_navigation"-->
-<!--        android:layout_centerInParent="true"-->
-<!--        android:layout_marginTop="100dp"-->
-<!--        tools:layout_editor_absoluteX="8dp" />-->
-
-<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
-<!--        android:id="@+id/bottom_navigation"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        menu="@menu/bottom_nav_menu_fav" />-->
-
-<!--</RelativeLayout>-->
+</RelativeLayout>
