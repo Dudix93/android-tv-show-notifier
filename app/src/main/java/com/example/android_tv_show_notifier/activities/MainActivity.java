@@ -357,8 +357,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else if (nav_item.equals(getResources().getString(R.string.favourites))) {
             Intent favouritesIntent = new Intent(this.mContext, FavouriteActivity.class);
             favouritesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            favouritesIntent.putExtra("nav_bar_title", this.toolbar.getTitle());
             this.mContext.startActivity(favouritesIntent);
-            if (toolbar != null) toolbar.setTitle(R.string.favourites);
         }
 
         DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;

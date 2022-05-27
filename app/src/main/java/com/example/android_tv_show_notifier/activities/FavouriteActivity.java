@@ -59,10 +59,13 @@ public class FavouriteActivity extends AppCompatActivity {
     public void setupToolbarNavIcon() {
         Toolbar toolbar = findViewById(R.id.favourites_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        toolbar.setTitle(getResources().getString(R.string.favourites));
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String nav_bar_title = getIntent().getStringExtra("nav_bar_title");
+//                if (nav_bar_title != null) toolbar.setTitle(nav_bar_title);
                 finish();
             }
         });
