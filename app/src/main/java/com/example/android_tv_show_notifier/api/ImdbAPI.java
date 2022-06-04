@@ -1,9 +1,10 @@
 package com.example.android_tv_show_notifier.api;
 
-import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 import com.example.android_tv_show_notifier.models.NameModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
+import com.example.android_tv_show_notifier.models.SearchDataModel;
+import com.example.android_tv_show_notifier.models.SearchResultsModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
 
@@ -33,5 +34,8 @@ public interface ImdbAPI {
 
     @GET("Name/k_9od86016/" + "{id}")
     Call<NameModel> getActor(@Path("id") String id);
+
+    @GET("SearchTitle/k_9od86016/" + "{id}")
+    Call<SearchDataModel> getSearchData(@Path("id") String id);
 
 }

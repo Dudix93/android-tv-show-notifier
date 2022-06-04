@@ -5,46 +5,43 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TableLayout;
+import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.example.android_tv_show_notifier.Database.RoomDB;
-import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
-import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.MostPopularMoviesListAdapter;
 import com.example.android_tv_show_notifier.adapters.NewMoviesListAdapter;
+import com.example.android_tv_show_notifier.adapters.SearchTitleListAdapter;
 import com.example.android_tv_show_notifier.adapters.TitlesListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
-import com.example.android_tv_show_notifier.models.NameModel;
 import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
 import com.example.android_tv_show_notifier.models.MostPopularDataModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataDetailModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
-import com.example.android_tv_show_notifier.models.TitleModel;
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.example.android_tv_show_notifier.models.SearchDataModel;
+import com.example.android_tv_show_notifier.models.SearchResultsModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -66,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView moviesRecyclerView;
     private NavigationView navigationView;
     private MostPopularMoviesListAdapter mostPopularMoviesListAdapter;
+    private SearchTitleListAdapter searchTitleListAdapter;
     private NewMoviesListAdapter newMoviesListAdapter;
     private TitlesListAdapter titlesListAdapter;
     private Context mContext;
@@ -73,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Call<MostPopularDataModel> MostPopularMoviesAPICall;
     private Call<NewMovieDataModel> InTheatersAPICall;
     private Call<NewMovieDataModel> ComingSoonAPICall;
+    private Call<SearchDataModel> SearchTitleAPICall;
     private ImdbAPI imdbAPI;
     private Toolbar toolbar;
     private Button btSignIn;
@@ -99,6 +98,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setToolbar();
         getMostPopularTVs();
         setGoogleSignIn();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+        MenuItem searchViewItem = menu.findItem(R.id.app_bar_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+        searchView.setQueryHint(getString(R.string.search_for_all_titles));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                getSearchData(query);
+                return false;
+
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if (s.isEmpty() && moviesRecyclerView.getAdapter().getClass() == SearchTitleListAdapter.class) {
+                    if (toolbar.getTitle() == getString(R.string.top_tv)) {
+                        moviesRecyclerView.setAdapter(mostPopularMoviesListAdapter);
+                    } else if (toolbar.getTitle() == getString(R.string.top_movies)){
+                        moviesRecyclerView.setAdapter(mostPopularMoviesListAdapter);
+                    } else if (toolbar.getTitle() == getString(R.string.in_theaters)){
+                        moviesRecyclerView.setAdapter(newMoviesListAdapter);
+                    } else if (toolbar.getTitle() == getString(R.string.coming_soon)){
+                        moviesRecyclerView.setAdapter(newMoviesListAdapter);
+                    }
+                }
+                return false;
+            }
+
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     public void setGoogleSignIn() {
@@ -214,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     else {
                         if (response.body() != null) {
-                            setMostPopularMoviesListAdapterListAdapter(new ArrayList<MostPopularDataDetailModel>(response.body().getItems()));
+                            setMostPopularMoviesListAdapter(new ArrayList<MostPopularDataDetailModel>(response.body().getItems()));
                         }
                     }
                 }
@@ -241,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     else {
                         if (response.body() != null) {
-                            setMostPopularMoviesListAdapterListAdapter(new ArrayList<MostPopularDataDetailModel>(response.body().getItems()));
+                            setMostPopularMoviesListAdapter(new ArrayList<MostPopularDataDetailModel>(response.body().getItems()));
                         }
                     }
                 }
@@ -268,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     else {
                         if (response.body() != null) {
-                            setNewMoviesListAdapterListAdapter(new ArrayList<NewMovieDataDetailModel>(response.body().getItems()));
+                            setNewMoviesListAdapter(new ArrayList<NewMovieDataDetailModel>(response.body().getItems()));
                         }
                     }
                 }
@@ -295,13 +330,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     else {
                         if (response.body() != null) {
-                            setNewMoviesListAdapterListAdapter(new ArrayList<NewMovieDataDetailModel>(response.body().getItems()));
+                            setNewMoviesListAdapter(new ArrayList<NewMovieDataDetailModel>(response.body().getItems()));
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<NewMovieDataModel> call, Throwable t) {
+                    displayToast(t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            displayToast(e.getMessage());
+        }
+    }
+
+    public void getSearchData(String searchEpression) {
+        this.SearchTitleAPICall = imdbAPI.getSearchData(searchEpression);
+        try {
+            SearchTitleAPICall.enqueue(new Callback<SearchDataModel>() {
+                @Override
+                public void onResponse(Call<SearchDataModel> call, Response<SearchDataModel> response) {
+
+                    if (response.code() != 200) {
+                        displayToast(response.message());
+                    }
+                    else {
+                        if (response.body() != null) {
+                            ArrayList<SearchResultsModel> results = new ArrayList<SearchResultsModel>(response.body().getResults());
+                            if (results.size() > 0) {
+                                setSearchDataListAdapter(new ArrayList<SearchResultsModel>(response.body().getResults()));
+                            }
+                            else {
+                                displayToast(getString(R.string.no_results));
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SearchDataModel> call, Throwable t) {
                     displayToast(t.getMessage());
                 }
             });
@@ -366,17 +434,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public void setMostPopularMoviesListAdapterListAdapter(ArrayList<MostPopularDataDetailModel> arrayList) {
+    public void setMostPopularMoviesListAdapter(ArrayList<MostPopularDataDetailModel> arrayList) {
         mostPopularMoviesListAdapter = new MostPopularMoviesListAdapter(arrayList, mContext);
         moviesRecyclerView.setAdapter(mostPopularMoviesListAdapter);
     }
 
-    public void setNewMoviesListAdapterListAdapter(ArrayList<NewMovieDataDetailModel> arrayList) {
+    public void setSearchDataListAdapter(ArrayList<SearchResultsModel> arrayList) {
+        searchTitleListAdapter = new SearchTitleListAdapter(arrayList, mContext);
+        moviesRecyclerView.setAdapter(searchTitleListAdapter);
+    }
+
+    public void setNewMoviesListAdapter(ArrayList<NewMovieDataDetailModel> arrayList) {
         newMoviesListAdapter = new NewMoviesListAdapter(arrayList, mContext);
         moviesRecyclerView.setAdapter(newMoviesListAdapter);
     }
 
     public void displayToast(String s) {
         Toast.makeText(mContext,s,Toast.LENGTH_SHORT).show();
+    }
+
+    public void updateSearchResults(String searchExpression) {
+
     }
 }

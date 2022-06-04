@@ -13,4 +13,6 @@
     <string name="favourite_actors">Favourite Actors</string>
     <string name="actors">Actors</string>
     <string name="titles">Titles</string>
+    <string name="no_results">No results</string>
+    <string name="search_for_all_titles">Search For All Titles</string>
 </resources>
