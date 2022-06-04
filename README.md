@@ -6,10 +6,8 @@
  - actor details (photo, bio, list of known for titles)
  - sign in option using Google Authenticator
  - saving/deletion titles and actors as favourites ones (offline using RoomDB, online via Firebase)
-
-## To do:
-- list of favourite titles/actors
-- title/actor search functionality
+ - list of favourite titles/actors
+ - title search functionality
 
 
 |<img src="screenshots/home_screen.png" alt="drawing" width="100%"/>|<img src="screenshots/nav_drawer.png" alt="drawing" width="100%"/>|
