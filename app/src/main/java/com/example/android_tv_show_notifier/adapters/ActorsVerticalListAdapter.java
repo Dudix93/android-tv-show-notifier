@@ -37,9 +37,9 @@ public class ActorsVerticalListAdapter extends RecyclerView.Adapter<ActorsVertic
 
         public ActorViewHolder(View view) {
             super(view);
-            this.actorCardView = view.findViewById(R.id.title_list_item);
-            this.actorNameTextView = view.findViewById(R.id.title);
-            this.actorPhotoImageView = view.findViewById(R.id.movie_poster);
+            this.actorCardView = view.findViewById(R.id.actor_list_item);
+            this.actorNameTextView = view.findViewById(R.id.actor_name);
+            this.actorPhotoImageView = view.findViewById(R.id.actor_photo);
         }
 
         public CardView getActorCardView() { return this.actorCardView; }
@@ -50,7 +50,7 @@ public class ActorsVerticalListAdapter extends RecyclerView.Adapter<ActorsVertic
     @Override
     public ActorViewHolder onCreateViewHolder(ViewGroup viewGroup, int viwType) {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_movie, viewGroup, false);
+                .inflate(R.layout.item_actor_vertical, viewGroup, false);
         return new ActorViewHolder(view);
     }
 

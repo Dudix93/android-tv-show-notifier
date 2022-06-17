@@ -11,7 +11,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/title_list_item"
-            android:layout_height="wrap_content"
+            android:layout_height="150sp"
             android:layout_width="match_parent"
             app:cardBackgroundColor="@color/cardview_shadow_start_color"
             app:cardUseCompatPadding="false"
@@ -22,7 +22,8 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10sp"
                 android:orientation="horizontal">
 
                 <LinearLayout
