@@ -35,6 +35,7 @@ import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -96,7 +97,6 @@ public class TitleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_title);
         this.mContext = getApplicationContext();
         this.intentExtras = getIntent().getExtras();
-        this.titleNameTextView = findViewById(R.id.title_name);
         this.releaseYearTextView = findViewById(R.id.title_year);
         this.ratingTextView = findViewById(R.id.title_rating);
         this.plotTextView = findViewById(R.id.title_plot);
@@ -258,9 +258,9 @@ public class TitleActivity extends AppCompatActivity {
     public void setToolbar() {
         collapsingToolbar.setContentScrimColor(ContextCompat.getColor(getApplicationContext(), com.google.android.material.R.color.design_default_color_on_primary));
         collapsingToolbar.setTitleEnabled(true);
+        collapsingToolbar.setTitle(titleModel.getTitle());
         if (toolbar != null) {
             ((AppCompatActivity) TitleActivity.this).setSupportActionBar(toolbar);
-
             ActionBar actionBar = ((AppCompatActivity) TitleActivity.this).getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
@@ -269,7 +269,6 @@ public class TitleActivity extends AppCompatActivity {
     }
 
     public void setTitleInfo() {
-        titleNameTextView.setText(titleModel.getTitle());
         releaseYearTextView.setText(titleModel.getYear());
         ratingTextView.setText(titleModel.getImDbRating());
         plotTextView.setText(titleModel.getPlot());
