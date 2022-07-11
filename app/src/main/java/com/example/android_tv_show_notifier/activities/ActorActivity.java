@@ -1,5 +1,6 @@
 package com.example.android_tv_show_notifier.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -206,6 +208,24 @@ public class ActorActivity extends AppCompatActivity {
         knownForRecyclerView.setLayoutManager(mLayoutManager);
         knownForListAdapter = new KnownForListAdapter(knownForArrayList, mContext);
         knownForRecyclerView.setAdapter(knownForListAdapter);
+
+        setupActorSummaryModal();
+    }
+
+    public void setupActorSummaryModal() {
+        this.actorSummaryTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(ActorActivity.this);
+                View scrollView = LayoutInflater.from(ActorActivity.this).inflate(R.layout.scroll_view_layout, null);
+                TextView scrollTitleTextView = (TextView) scrollView.findViewById(R.id.scroll_title);
+                TextView scrollTextTextView = (TextView) scrollView.findViewById(R.id.scroll_text);
+                scrollTitleTextView.setText(nameModel.getName());
+                scrollTextTextView.setText(nameModel.getSummary());
+                dialogBuilder.setView(scrollView);
+                dialogBuilder.show();
+            }
+        });
     }
 
     private void displayToast(String s) {
