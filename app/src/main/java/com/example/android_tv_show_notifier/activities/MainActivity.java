@@ -8,21 +8,25 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.SearchView;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android_tv_show_notifier.R;
@@ -105,7 +109,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_menu, menu);
         MenuItem searchViewItem = menu.findItem(R.id.app_bar_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+
+        ImageView searchStartIcon = searchView.findViewById(androidx.appcompat.R.id.search_button);
+        ImageView searchCloseIcon = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        TextView searchTextView = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+
+        searchStartIcon.setColorFilter(getResources().getColor(R.color.color_text));
+        searchCloseIcon.setColorFilter(getResources().getColor(R.color.color_text));
+        searchTextView.setTextColor(getResources().getColor(R.color.color_text));
+
         searchView.setQueryHint(getString(R.string.search_for_all_titles));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -113,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchView.clearFocus();
                 getSearchData(query);
                 return false;
-
             }
 
             @Override
@@ -382,9 +394,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer , toolbar , R.string.navigation_drawer_open ,
-                R.string.navigation_drawer_close );
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer , toolbar , R.string.navigation_drawer_open , R.string.navigation_drawer_close );
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.color_text));
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView = findViewById(R.id.nav_view);

@@ -256,7 +256,6 @@ public class TitleActivity extends AppCompatActivity {
     }
 
     public void setToolbar() {
-        collapsingToolbar.setContentScrimColor(ContextCompat.getColor(getApplicationContext(), com.google.android.material.R.color.design_default_color_on_primary));
         collapsingToolbar.setTitleEnabled(true);
         collapsingToolbar.setTitle(titleModel.getTitle());
         if (toolbar != null) {

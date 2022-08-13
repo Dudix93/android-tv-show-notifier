@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/color_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -24,8 +25,10 @@
 
             <TextView
                 android:id="@+id/actor_summary"
+                android:textColor="@color/color_item"
                 android:layout_margin="10dp"
                 android:justificationMode="inter_word"
+                android:textSize="14sp"
                 android:ellipsize="end"
                 android:maxLines="8"
                 android:layout_gravity="center"
@@ -42,13 +45,17 @@
 
             <TextView
                 android:id="@+id/actor_name"
+                android:textColor="@color/color_item"
                 android:layout_marginBottom="10dp"
+                android:textSize="20sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/known_for"
-                android:text="Known for:"
+                android:textColor="@color/color_item"
+                android:textSize="20sp"
+                android:text="@string/known_for"
                 android:layout_marginBottom="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

@@ -1,6 +1,9 @@
 package com.example.android_tv_show_notifier.activities;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -55,6 +58,8 @@ public class FavouriteActivity extends AppCompatActivity {
         setupToolbarNavIcon();
         loadFavouriteTitles();
     }
+
+
 
     public void setupToolbarNavIcon() {
         Toolbar toolbar = findViewById(R.id.favourites_toolbar);

@@ -27,14 +27,25 @@
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/menu/activity_main_drawer.xml" value="0.36302083333333335" />
         <entry key="..\:/projekty/android-tv-show-notifier/app/src/main/res/menu/search_menu.xml" value="0.36302083333333335" />
         <entry key="app/src/main/res/drawable/ic_account_icon.xml" value="0.185" />
+        <entry key="app/src/main/res/drawable/ic_movie.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_person.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_actor.xml" value="0.28306159420289856" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.15070921985815602" />
         <entry key="app/src/main/res/layout/activity_title.xml" value="0.27445652173913043" />
+        <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.15070921985815602" />
         <entry key="app/src/main/res/layout/bottom_nav_menu_fav.xml" value="0.27445652173913043" />
+        <entry key="app/src/main/res/layout/fav_log_out_fab.xml" value="0.21331521739130435" />
         <entry key="app/src/main/res/layout/favourites_tab_layout.xml" value="0.27445652173913043" />
         <entry key="app/src/main/res/layout/item_actor_horizontal.xml" value="0.27445652173913043" />
         <entry key="app/src/main/res/layout/item_actor_vertical.xml" value="0.15070921985815602" />
         <entry key="app/src/main/res/layout/item_movie.xml" value="0.335" />
         <entry key="app/src/main/res/layout/movies_recycler_view.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/scroll_view_layout.xml" value="0.28306159420289856" />
+        <entry key="app/src/main/res/menu-v26/bottom_nav_menu_fav.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/menu/bottom_nav_menu_fav.xml" value="0.3390625" />
+        <entry key="app/src/main/res/menu/search_menu.xml" value="0.2101851851851852" />
       </map>
     </option>
   </component>

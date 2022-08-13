@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/color_item"
     android:layout_alignParentTop="true">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,6 +18,9 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:contentScrim="@color/color_background"
+            app:collapsedTitleTextColor="@color/color_item"
+            app:expandedTitleTextColor="@color/color_text"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
@@ -50,41 +54,90 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/title_year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:fontFamily="sans-serif-light"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            <TableLayout
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TableRow>
+                    <TextView
+                        android:id="@+id/title_year_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/release_year"
+                        android:textColor="@color/color_text"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:text="2137"
+                        android:id="@+id/title_year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/color_text"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:fontFamily="sans-serif-light"
+                        android:layout_toRightOf="@+id/title_year_text"
+                        android:textSize="14sp" />
+                </TableRow>
+
+                <TableRow>
+                    <TextView
+                        android:id="@+id/title_rating_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating"
+                        android:textColor="@color/color_text"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/title_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_toRightOf="@+id/title_rating_text"
+                        android:fontFamily="sans-serif-light"
+                        android:text="6.9"
+                        android:textSize="14sp"
+                        android:textColor="@color/color_text" />
+                </TableRow>
+
+            </TableLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+
+            </RelativeLayout>
 
             <TextView
-                android:id="@+id/title_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:fontFamily="sans-serif-light"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Summary"
+                android:textColor="@color/color_text"
+                android:text="@string/summary"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="32dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/title_plot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/color_text"
                 android:layout_margin="16dp"
                 android:fontFamily="sans-serif-light"
                 android:lineSpacingMultiplier="1.2"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+                android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/trailer_thumbnail"

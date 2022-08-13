@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/color_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.FavouriteActivity">
@@ -11,7 +12,8 @@
         android:id="@+id/favourites_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/color_item"
+        app:titleTextColor="@color/color_text"
         app:title="@string/favourites"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -27,6 +29,9 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_favourites"
+        android:background="@color/color_item"
+        app:itemIconTint="@color/color_text"
+        app:itemTextColor="@color/color_text"
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:layout_alignParentBottom="true"

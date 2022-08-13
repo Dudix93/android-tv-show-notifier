@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll_view"
+    android:background="@color/color_item"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -17,6 +18,8 @@
 
         <TextView
             android:id="@+id/scroll_title"
+            android:textAlignment="center"
+            android:textColor="@color/color_text"
             android:textSize="25sp"
             android:textStyle="bold"
             android:layout_marginBottom="5sp"
@@ -25,6 +28,7 @@
 
         <TextView
             android:id="@+id/scroll_text"
+            android:textColor="@color/color_text"
             android:textSize="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

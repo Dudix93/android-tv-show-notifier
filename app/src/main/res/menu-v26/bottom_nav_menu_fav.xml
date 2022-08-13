@@ -3,11 +3,12 @@
         android:id="@+id/favourite_titles"
         android:enabled="true"
         android:icon="@drawable/ic_movie"
-        android:color="@color/color_text"
+        android:iconTint="@color/color_text"
         android:title="@string/titles"/>
     <item
         android:id="@+id/favourite_actors"
         android:enabled="true"
         android:icon="@drawable/ic_person"
+        android:iconTint="@color/color_text"
         android:title="@string/actors"/>
 </menu>
