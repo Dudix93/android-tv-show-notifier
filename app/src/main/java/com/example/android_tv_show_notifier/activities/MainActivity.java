@@ -2,23 +2,24 @@ package com.example.android_tv_show_notifier.activities;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,11 +30,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.MostPopularMoviesListAdapter;
 import com.example.android_tv_show_notifier.adapters.NewMoviesListAdapter;
 import com.example.android_tv_show_notifier.adapters.SearchTitleListAdapter;
-import com.example.android_tv_show_notifier.adapters.TitlesListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
 import com.example.android_tv_show_notifier.models.MostPopularDataDetailModel;
@@ -42,12 +43,17 @@ import com.example.android_tv_show_notifier.models.NewMovieDataDetailModel;
 import com.example.android_tv_show_notifier.models.NewMovieDataModel;
 import com.example.android_tv_show_notifier.models.SearchDataModel;
 import com.example.android_tv_show_notifier.models.SearchResultsModel;
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.BeginSignInResult;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.identity.SignInClient;
+import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthCredential;
@@ -69,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MostPopularMoviesListAdapter mostPopularMoviesListAdapter;
     private SearchTitleListAdapter searchTitleListAdapter;
     private NewMoviesListAdapter newMoviesListAdapter;
-    private TitlesListAdapter titlesListAdapter;
     private Context mContext;
     private Call<MostPopularDataModel> MostPopularTVsAPICall;
     private Call<MostPopularDataModel> MostPopularMoviesAPICall;
@@ -79,29 +84,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ImdbAPI imdbAPI;
     private Toolbar toolbar;
     private Button btSignIn;
-    private GoogleSignInClient googleSignInClient;
     private FirebaseAuth firebaseAuth;
-    private GoogleSignInOptions googleSignInOptions;
-    private ActivityResultLauncher activityResultLauncher;
     private AuthCredential authCredential;
     private FirebaseUser firebaseUser;
+    private NetworkAvailabilityDialogFragment networkAvailabilityDialogFragment;
+
+    private SignInClient oneTapClient;
+    private BeginSignInRequest signInRequest;
+    private static final int REQ_ONE_TAP = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.mContext = getApplicationContext();
-        this.imdbAPI = new RetrofitInstance().api;
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
         this.moviesRecyclerView = (RecyclerView) findViewById(R.id.vertical_recycler_view);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
         this.moviesRecyclerView.setLayoutManager(mLayoutManager);
-        this.firebaseAuth = FirebaseAuth.getInstance();
-        setToolbar();
-        getMostPopularTVs();
-        setGoogleSignIn();
+        this.networkAvailabilityDialogFragment = new NetworkAvailabilityDialogFragment();
+        if (!this.networkAvailabilityDialogFragment.isNetworkAvailable(this.mContext)) {
+            FragmentManager fm = getSupportFragmentManager();
+            this.networkAvailabilityDialogFragment.show(fm, NetworkAvailabilityDialogFragment.TAG);
+            fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                @Override
+                public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                    super.onFragmentViewDestroyed(fm, f);
+
+                    imdbAPI = new RetrofitInstance().api;
+                    firebaseAuth = FirebaseAuth.getInstance();
+                    setToolbar();
+                    getMostPopularTVs();
+                    setGoogleSignIn();
+
+                    fm.unregisterFragmentLifecycleCallbacks(this);
+                }
+            }, false);
+        }
+        else {
+            this.imdbAPI = new RetrofitInstance().api;
+            this.firebaseAuth = FirebaseAuth.getInstance();
+            oneTapClient = Identity.getSignInClient(this);
+            setToolbar();
+            getMostPopularTVs();
+            setGoogleSignIn();
+        }
     }
 
     @Override
@@ -148,37 +177,96 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_ONE_TAP:
+                try {
+                    SignInCredential credential = oneTapClient.getSignInCredentialFromIntent(data);
+                    String idToken = credential.getGoogleIdToken();
+                    AuthCredential credentials = GoogleAuthProvider.getCredential(idToken,null);
+                    if (idToken !=  null) {
+                        firebaseAuth.signInWithCredential(credentials).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if(task.isSuccessful())
+                                {
+                                    setLogOutOnClickListener();
+                                    firebaseAuth = FirebaseAuth.getInstance();
+                                    firebaseUser = firebaseAuth.getCurrentUser();
+                                    if (firebaseUser != null)
+                                    {
+                                        displayToast("Hi " + firebaseUser.getDisplayName());
+                                        btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
+                                    }
+                                }
+                                else
+                                {
+                                    displayToast("Authentication Failed :"+task.getException().getMessage());
+                                }
+                            }
+                        });
+                    }
+                } catch (ApiException e) {
+                    displayToast(e.getLocalizedMessage());
+                }
+                break;
+        }
+    }
+
+    public void setupOneTapClient() {
+        signInRequest = BeginSignInRequest.builder()
+                .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
+                        .setSupported(true)
+                        .build())
+                .setGoogleIdTokenRequestOptions(BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                        .setSupported(true)
+                        .setServerClientId(getString(R.string.default_web_client_id))
+                        .setFilterByAuthorizedAccounts(false)
+                        .build())
+                .setAutoSelectEnabled(true)
+                .build();
+        oneTapClient.beginSignIn(signInRequest)
+                .addOnSuccessListener(this, new OnSuccessListener<BeginSignInResult>() {
+                    @Override
+                    public void onSuccess(BeginSignInResult result) {
+                        try {
+                            startIntentSenderForResult(result.getPendingIntent().getIntentSender(), REQ_ONE_TAP, null, 0, 0, 0);
+                        } catch (IntentSender.SendIntentException e) {
+                            displayToast("Couldn't start One Tap UI: " + e.getLocalizedMessage());
+                        }
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // No saved credentials found. Launch the One Tap sign-up flow, or
+                        // do nothing and continue presenting the signed-out UI.
+                        displayToast(e.getLocalizedMessage());
+                    }
+                });
+    }
+
     public void setGoogleSignIn() {
         btSignIn = navigationView.getHeaderView(0).findViewById(R.id.bt_sign_in);
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null) {
             btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
+            setLogOutOnClickListener();
         }
         else {
             btSignIn.setText(R.string.log_in);
+            setLogInOnClickListener();
         }
-        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(MainActivity.this ,googleSignInOptions);
-        setActivityResultLauncher();
-        btSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent googleSignInIntent = googleSignInClient.getSignInIntent();
-                activityResultLauncher.launch(googleSignInIntent);
-            }
-        });
     }
 
     public void setLogInOnClickListener() {
         btSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent googleSignInIntent = googleSignInClient.getSignInIntent();
-                activityResultLauncher.launch(googleSignInIntent);
+                setupOneTapClient();
             }
         });
     }
@@ -187,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                oneTapClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful())
@@ -199,52 +287,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                 });
-            }
-        });
-    }
-
-    public void setActivityResultLauncher() {
-        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback() {
-            @Override
-            public void onActivityResult(Object result) {
-                if (((ActivityResult)result).getData() != null) {
-                    Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn.getSignedInAccountFromIntent(((ActivityResult)result).getData());
-
-                    try {
-                        GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
-                        if(googleSignInAccount != null)
-                        {
-                            authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(),null);
-                            firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(task.isSuccessful())
-                                    {
-                                        setLogOutOnClickListener();
-                                        firebaseAuth = FirebaseAuth.getInstance();
-                                        firebaseUser = firebaseAuth.getCurrentUser();
-                                        if (firebaseUser != null)
-                                        {
-                                            displayToast("Hi " + firebaseUser.getDisplayName());
-                                            btSignIn.setText(firebaseUser.getDisplayName() + " (log out)");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        displayToast("Authentication Failed :"+task.getException().getMessage());
-                                    }
-                                }
-                            });
-                        }
-                    }
-                    catch (ApiException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    if(signInAccountTask.isSuccessful())
-                    {
-                    }
-                }
             }
         });
     }
@@ -415,34 +457,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings ( "StatementWithEmptyBody" )
     @Override
     public boolean onNavigationItemSelected ( @NonNull MenuItem item) {
-        String nav_item = item.getTitle().toString();
+        if (!this.networkAvailabilityDialogFragment.isNetworkAvailable(this.mContext)) {
+            this.networkAvailabilityDialogFragment.show(getSupportFragmentManager(), NetworkAvailabilityDialogFragment.TAG);
+            return false;
+        }
+        else {
+            String nav_item = item.getTitle().toString();
 
-        if (nav_item.equals(getResources().getString(R.string.in_theaters))) {
-            getInTheaters();
-            if (toolbar != null) toolbar.setTitle(R.string.in_theaters);
-        }
-        else if (nav_item.equals(getResources().getString(R.string.coming_soon))) {
-            getComingSoon();
-            if (toolbar != null) toolbar.setTitle(R.string.coming_soon);
-        }
-        else if (nav_item.equals(getResources().getString(R.string.top_movies))) {
-            getMostPopularMovies();
-            if (toolbar != null) toolbar.setTitle(R.string.top_movies);
-        }
-        else if (nav_item.equals(getResources().getString(R.string.top_tv))) {
-            getMostPopularTVs();
-            if (toolbar != null) toolbar.setTitle(R.string.top_tv);
-        }
-        else if (nav_item.equals(getResources().getString(R.string.favourites))) {
-            Intent favouritesIntent = new Intent(this.mContext, FavouriteActivity.class);
-            favouritesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            favouritesIntent.putExtra("nav_bar_title", this.toolbar.getTitle());
-            this.mContext.startActivity(favouritesIntent);
-        }
+            if (nav_item.equals(getResources().getString(R.string.in_theaters))) {
+                getInTheaters();
+                if (toolbar != null) toolbar.setTitle(R.string.in_theaters);
+            }
+            else if (nav_item.equals(getResources().getString(R.string.coming_soon))) {
+                getComingSoon();
+                if (toolbar != null) toolbar.setTitle(R.string.coming_soon);
+            }
+            else if (nav_item.equals(getResources().getString(R.string.top_movies))) {
+                getMostPopularMovies();
+                if (toolbar != null) toolbar.setTitle(R.string.top_movies);
+            }
+            else if (nav_item.equals(getResources().getString(R.string.top_tv))) {
+                getMostPopularTVs();
+                if (toolbar != null) toolbar.setTitle(R.string.top_tv);
+            }
+            else if (nav_item.equals(getResources().getString(R.string.favourites))) {
+                Intent favouritesIntent = new Intent(this.mContext, FavouriteActivity.class);
+                favouritesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                favouritesIntent.putExtra("nav_bar_title", this.toolbar.getTitle());
+                this.mContext.startActivity(favouritesIntent);
+            }
 
-        DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
-        drawer.closeDrawer(GravityCompat. START ) ;
-        return true;
+            DrawerLayout drawer = findViewById(R.id. drawer_layout ) ;
+            drawer.closeDrawer(GravityCompat. START ) ;
+            return true;
+        }
     }
 
     public void setMostPopularMoviesListAdapter(ArrayList<MostPopularDataDetailModel> arrayList) {
@@ -462,9 +510,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void displayToast(String s) {
         Toast.makeText(mContext,s,Toast.LENGTH_SHORT).show();
-    }
-
-    public void updateSearchResults(String searchExpression) {
-
     }
 }
