@@ -8,7 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -16,6 +20,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.TitleActivity;
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +79,7 @@ public class FavouriteTitlesListAdapter extends RecyclerView.Adapter<FavouriteTi
                 Intent titleIntent = new Intent(view.getContext(), TitleActivity.class);
                 titleIntent.putExtra("title_id", mTitles.get(viewHolder.getAdapterPosition()).getTitleId());
                 titleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(titleIntent);
+                new NetworkAvailabilityDialogFragment().checkNetwofkForNewIntent(mContext, view, titleIntent);
             }
         });
     }

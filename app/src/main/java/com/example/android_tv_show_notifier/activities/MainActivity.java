@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     imdbAPI = new RetrofitInstance().api;
                     firebaseAuth = FirebaseAuth.getInstance();
+                    oneTapClient = Identity.getSignInClient(mContext);
                     setToolbar();
                     getMostPopularTVs();
                     setGoogleSignIn();
@@ -241,8 +242,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        // No saved credentials found. Launch the One Tap sign-up flow, or
-                        // do nothing and continue presenting the signed-out UI.
                         displayToast(e.getLocalizedMessage());
                     }
                 });
@@ -266,7 +265,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setupOneTapClient();
+                if (!networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    networkAvailabilityDialogFragment.show(fm, NetworkAvailabilityDialogFragment.TAG);
+                    fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                        @Override
+                        public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                            super.onFragmentViewDestroyed(fm, f);
+
+                            if (networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) setupOneTapClient();
+
+                            fm.unregisterFragmentLifecycleCallbacks(this);
+                        }
+                    }, false);
+                }
+                else {
+                    setupOneTapClient();
+                }
             }
         });
     }
@@ -275,18 +290,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                oneTapClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                        {
-                            firebaseAuth.signOut();
-                            btSignIn.setText(R.string.log_in);
-                            displayToast("Logout successful");
-                            setLogInOnClickListener();
+                if (!networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    networkAvailabilityDialogFragment.show(fm, NetworkAvailabilityDialogFragment.TAG);
+                    fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                        @Override
+                        public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                            super.onFragmentViewDestroyed(fm, f);
+
+                            if (networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                                oneTapClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful())
+                                        {
+                                            firebaseAuth.signOut();
+                                            btSignIn.setText(R.string.log_in);
+                                            displayToast("Logout successful");
+                                            setLogInOnClickListener();
+                                        }
+                                    }
+                                });
+                            }
+
+                            fm.unregisterFragmentLifecycleCallbacks(this);
                         }
-                    }
-                });
+                    }, false);
+                }
+                else {
+                    oneTapClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful())
+                            {
+                                firebaseAuth.signOut();
+                                btSignIn.setText(R.string.log_in);
+                                displayToast("Logout successful");
+                                setLogInOnClickListener();
+                            }
+                        }
+                    });
+                }
             }
         });
     }

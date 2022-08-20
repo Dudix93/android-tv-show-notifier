@@ -8,13 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.TitleActivity;
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 import com.example.android_tv_show_notifier.models.NewMovieDataDetailModel;
 
 import java.util.ArrayList;
@@ -73,7 +78,7 @@ public class NewMoviesListAdapter extends RecyclerView.Adapter<NewMoviesListAdap
                 Intent titleIntent = new Intent(view.getContext(), TitleActivity.class);
                 titleIntent.putExtra("title_id", mMovies.get(viewHolder.getAdapterPosition()).getId());
                 titleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(titleIntent);
+                new NetworkAvailabilityDialogFragment().checkNetwofkForNewIntent(mContext, view, titleIntent);
             }
         });
     }

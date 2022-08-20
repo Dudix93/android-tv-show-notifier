@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.TitleActivity;
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 import com.example.android_tv_show_notifier.models.TitleModel;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class TitlesListAdapter extends RecyclerView.Adapter<TitlesListAdapter.Ti
                 Intent titleIntent = new Intent(view.getContext(), TitleActivity.class);
                 titleIntent.putExtra("title_id", mTitles.get(viewHolder.getAdapterPosition()).getId());
                 titleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(titleIntent);
+                new NetworkAvailabilityDialogFragment().checkNetwofkForNewIntent(mContext, view, titleIntent);
             }
         });
     }

@@ -5,6 +5,7 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -18,6 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.activities.ActorActivity;
@@ -58,5 +62,26 @@ public class NetworkAvailabilityDialogFragment extends DialogFragment {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public void checkNetwofkForNewIntent(Context context, View view, Intent intent) {
+        NetworkAvailabilityDialogFragment networkAvailabilityDialogFragment = new NetworkAvailabilityDialogFragment();
+        if (!networkAvailabilityDialogFragment.isNetworkAvailable(context)) {
+            FragmentManager fm = ((FragmentActivity)view.getContext()).getSupportFragmentManager();
+            networkAvailabilityDialogFragment.show(fm, NetworkAvailabilityDialogFragment.TAG);
+            fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                @Override
+                public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                    super.onFragmentViewDestroyed(fm, f);
+
+                    if (networkAvailabilityDialogFragment.isNetworkAvailable(context)) context.startActivity(intent);
+
+                    fm.unregisterFragmentLifecycleCallbacks(this);
+                }
+            }, false);
+        }
+        else {
+            context.startActivity(intent);
+        }
     }
 }

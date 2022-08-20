@@ -8,12 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.activities.ActorActivity;
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.R;
 
@@ -65,7 +71,7 @@ public class ActorsHorizontalListAdapter extends RecyclerView.Adapter<ActorsHori
                 Intent actorIntent = new Intent(view.getContext(), ActorActivity.class);
                 actorIntent.putExtra("actor_id", mActors.get(viewHolder.getAdapterPosition()).getId());
                 actorIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(actorIntent);
+                new NetworkAvailabilityDialogFragment().checkNetwofkForNewIntent(mContext, view, actorIntent);
             }
         });
     }

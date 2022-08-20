@@ -1,8 +1,12 @@
 package com.example.android_tv_show_notifier.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,10 +24,12 @@ import com.example.android_tv_show_notifier.Database.RoomDB;
 import com.example.android_tv_show_notifier.DownloadImageFromUrl;
 import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
 import com.example.android_tv_show_notifier.Entities.FavouriteActorEntity;
+import com.example.android_tv_show_notifier.Entities.FavouriteTitleEntity;
 import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.KnownForListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 import com.example.android_tv_show_notifier.models.KnownForModel;
 import com.example.android_tv_show_notifier.models.NameModel;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -111,18 +117,49 @@ public class ActorActivity extends AppCompatActivity {
                     favFAB.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (!isFavourite) {
-                                FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(),
-                                        nameModel.getName(),
-                                        nameModel.getImage());
-                                firebaseDB.insertActor(favouriteActorEntity);
-                                favFAB.setIcon(unfav_icon);
-                                displayToast(getString(R.string.fav_added));
+                            NetworkAvailabilityDialogFragment networkAvailabilityDialogFragment = new NetworkAvailabilityDialogFragment();
+                            if (!networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                                FragmentManager fm = ((FragmentActivity)view.getContext()).getSupportFragmentManager();
+                                networkAvailabilityDialogFragment.show(fm, NetworkAvailabilityDialogFragment.TAG);
+                                fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                                    @Override
+                                    public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                                        super.onFragmentViewDestroyed(fm, f);
+
+                                        if (networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                                            if (!isFavourite) {
+                                                FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(),
+                                                        nameModel.getName(),
+                                                        nameModel.getImage());
+                                                firebaseDB.insertActor(favouriteActorEntity);
+                                                favFAB.setIcon(unfav_icon);
+                                                displayToast(getString(R.string.fav_added));
+                                            }
+                                            else if (isFavourite) {
+                                                titleReference.removeValue();
+                                                favFAB.setIcon(fav_icon);
+                                                displayToast(getString(R.string.fav_removed));
+                                            }
+                                        }
+
+                                        fm.unregisterFragmentLifecycleCallbacks(this);
+                                    }
+                                }, false);
                             }
-                            else if (isFavourite) {
-                                titleReference.removeValue();
-                                favFAB.setIcon(fav_icon);
-                                displayToast(getString(R.string.fav_removed));
+                            else {
+                                if (!isFavourite) {
+                                    FavouriteActorEntity favouriteActorEntity = new FavouriteActorEntity(nameModel.getId(),
+                                            nameModel.getName(),
+                                            nameModel.getImage());
+                                    firebaseDB.insertActor(favouriteActorEntity);
+                                    favFAB.setIcon(unfav_icon);
+                                    displayToast(getString(R.string.fav_added));
+                                }
+                                else if (isFavourite) {
+                                    titleReference.removeValue();
+                                    favFAB.setIcon(fav_icon);
+                                    displayToast(getString(R.string.fav_removed));
+                                }
                             }
                         }
                     });

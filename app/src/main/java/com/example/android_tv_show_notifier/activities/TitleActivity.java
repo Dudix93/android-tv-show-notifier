@@ -1,11 +1,15 @@
 package com.example.android_tv_show_notifier.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +36,7 @@ import com.example.android_tv_show_notifier.R;
 import com.example.android_tv_show_notifier.adapters.ActorsHorizontalListAdapter;
 import com.example.android_tv_show_notifier.api.ImdbAPI;
 import com.example.android_tv_show_notifier.api.RetrofitInstance;
+import com.example.android_tv_show_notifier.fragments.NetworkAvailabilityDialogFragment;
 import com.example.android_tv_show_notifier.models.ActorModel;
 import com.example.android_tv_show_notifier.models.TitleModel;
 import com.example.android_tv_show_notifier.models.TrailerModel;
@@ -131,19 +136,51 @@ public class TitleActivity extends AppCompatActivity {
                     favFAB.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (!isFavourite) {
-                                FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
-                                        titleModel.getTitle(),
-                                        Integer.parseInt(titleModel.getYear()),
-                                        titleModel.getImage());
-                                firebaseDB.insertTitle(favouriteTitleEntity);
-                                favFAB.setIcon(unfav_icon);
-                                displayToast(getString(R.string.fav_added));
+                            NetworkAvailabilityDialogFragment networkAvailabilityDialogFragment = new NetworkAvailabilityDialogFragment();
+                            if (!networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                                FragmentManager fm = ((FragmentActivity)view.getContext()).getSupportFragmentManager();
+                                networkAvailabilityDialogFragment.show(fm, NetworkAvailabilityDialogFragment.TAG);
+                                fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                                    @Override
+                                    public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                                        super.onFragmentViewDestroyed(fm, f);
+
+                                        if (networkAvailabilityDialogFragment.isNetworkAvailable(mContext)) {
+                                            if (!isFavourite) {
+                                                FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
+                                                        titleModel.getTitle(),
+                                                        Integer.parseInt(titleModel.getYear()),
+                                                        titleModel.getImage());
+                                                firebaseDB.insertTitle(favouriteTitleEntity);
+                                                favFAB.setIcon(unfav_icon);
+                                                displayToast(getString(R.string.fav_added));
+                                            }
+                                            else if (isFavourite) {
+                                                titleReference.removeValue();
+                                                favFAB.setIcon(fav_icon);
+                                                displayToast(getString(R.string.fav_removed));
+                                            }
+                                        }
+
+                                        fm.unregisterFragmentLifecycleCallbacks(this);
+                                    }
+                                }, false);
                             }
-                            else if (isFavourite) {
-                                titleReference.removeValue();
-                                favFAB.setIcon(fav_icon);
-                                displayToast(getString(R.string.fav_removed));
+                            else {
+                                if (!isFavourite) {
+                                    FavouriteTitleEntity favouriteTitleEntity = new FavouriteTitleEntity(titleModel.getId(),
+                                            titleModel.getTitle(),
+                                            Integer.parseInt(titleModel.getYear()),
+                                            titleModel.getImage());
+                                    firebaseDB.insertTitle(favouriteTitleEntity);
+                                    favFAB.setIcon(unfav_icon);
+                                    displayToast(getString(R.string.fav_added));
+                                }
+                                else if (isFavourite) {
+                                    titleReference.removeValue();
+                                    favFAB.setIcon(fav_icon);
+                                    displayToast(getString(R.string.fav_removed));
+                                }
                             }
                         }
                     });
@@ -277,7 +314,7 @@ public class TitleActivity extends AppCompatActivity {
         trailerThumbnailImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerModel.getLink())));
+                new NetworkAvailabilityDialogFragment().checkNetwofkForNewIntent(mContext, view, new Intent(Intent.ACTION_VIEW, Uri.parse(trailerModel.getLink())));
             }
         });
         setActorsList();
